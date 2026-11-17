@@ -15,6 +15,13 @@
       "when": 1794936964504,
       "tag": "0001_photos",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794937946949,
+      "tag": "0002_wardrobe",
+      "breakpoints": true
     }
   ]
 }
