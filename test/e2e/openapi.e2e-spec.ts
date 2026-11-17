@@ -23,6 +23,8 @@ describe('OpenAPI contract', () => {
       '/v1/photos',
       '/v1/photos/{id}/complete',
       '/v1/playground/chat',
+      '/v1/wardrobe/items',
+      '/v1/wardrobe/items/{id}',
     ]);
   });
 

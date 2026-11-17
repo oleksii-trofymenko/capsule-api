@@ -61,5 +61,49 @@ export const photos = pgTable(
   (t) => [index('photos_user_idx').on(t.userId)],
 );
 
+export const CATEGORIES = [
+  'top',
+  'bottom',
+  'dress',
+  'outerwear',
+  'shoes',
+  'accessory',
+] as const;
+export const FORMALITIES = ['casual', 'smart', 'formal'] as const;
+export const SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;
+/** INT is letter sizing (XS to XXL). A size is meaningless without its system. */
+export const SIZE_SYSTEMS = ['UK', 'EU', 'US', 'INT'] as const;
+
+export const wardrobeItems = pgTable(
+  'wardrobe_items',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    photoId: uuid('photo_id').references(() => photos.id, {
+      onDelete: 'set null',
+    }),
+    name: text('name').notNull(),
+    category: text('category', { enum: CATEGORIES }).notNull(),
+    colour: text('colour').notNull(),
+    formality: text('formality', { enum: FORMALITIES }).notNull(),
+    seasons: text('seasons', { enum: SEASONS }).array().notNull(),
+    sizeSystem: text('size_system', { enum: SIZE_SYSTEMS }),
+    sizeValue: text('size_value'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('wardrobe_items_user_idx').on(t.userId),
+    index('wardrobe_items_photo_idx').on(t.photoId),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type PhotoRow = typeof photos.$inferSelect;
+export type WardrobeItemRow = typeof wardrobeItems.$inferSelect;
