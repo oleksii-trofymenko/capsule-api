@@ -1,9 +1,5 @@
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
-import {
-  AIMessage,
-  AIMessageChunk,
-  type BaseMessage,
-} from '@langchain/core/messages';
+import { AIMessageChunk, type BaseMessage } from '@langchain/core/messages';
 import { ChatGenerationChunk, type ChatResult } from '@langchain/core/outputs';
 
 export type ScriptStep = AIMessageChunk[] | Error;
@@ -57,10 +53,12 @@ export class ScriptedChatModel extends BaseChatModel {
   }
 
   async _generate(messages: BaseMessage[]): Promise<ChatResult> {
-    let text = '';
-    for await (const chunk of this._streamResponseChunks(messages))
-      text += chunk.text;
-    return { generations: [{ text, message: new AIMessage(text) }] };
+    let message = new AIMessageChunk('');
+    for await (const chunk of this._streamResponseChunks(messages)) {
+      message = message.concat(chunk.message as AIMessageChunk);
+    }
+    // Return the chunk itself: it keeps tool calls, which withStructuredOutput reads.
+    return { generations: [{ text: message.text, message }] };
   }
 
   override async *_streamResponseChunks(

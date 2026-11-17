@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Inject,
   Param,
@@ -33,7 +34,18 @@ export class PhotosController {
     return this.photos.createUpload(user.id, body);
   }
 
-  /** Call after the upload succeeds. */
+  /** The photo, with its tagging status and the model's suggested tags. */
+  @Get(':id')
+  @ApiResponse({ status: 200, standardSchema: photoSchema })
+  @ApiResponse({ status: 404, description: 'No such photo for this user' })
+  get(
+    @CurrentUser() user: AuthUser,
+    @Param('id', { schema: photoIdSchema }) id: string,
+  ) {
+    return this.photos.get(user.id, id);
+  }
+
+  /** Call after the upload succeeds. Tagging starts then. */
   @Post(':id/complete')
   @HttpCode(200)
   @ApiResponse({ status: 200, standardSchema: photoSchema })

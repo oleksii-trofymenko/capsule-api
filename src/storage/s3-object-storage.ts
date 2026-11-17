@@ -1,5 +1,6 @@
 import {
   DeleteObjectCommand,
+  GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -54,6 +55,16 @@ export class S3ObjectStorage implements ObjectStorage {
     });
   }
 
+  get(key: string): Promise<Uint8Array> {
+    return this.measure('get', async () => {
+      const res = await this.s3.send(
+        new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+      );
+      if (!res.Body) throw new Error('Stored object has no body');
+      return res.Body.transformToByteArray();
+    });
+  }
+
   head(key: string): Promise<StoredObject | null> {
     return this.measure('head', async () => {
       try {
@@ -80,7 +91,7 @@ export class S3ObjectStorage implements ObjectStorage {
   }
 
   private async measure<T>(
-    operation: 'head' | 'delete',
+    operation: 'get' | 'head' | 'delete',
     call: () => Promise<T>,
   ): Promise<T> {
     const stop = this.metrics.storageDuration.startTimer({ operation });

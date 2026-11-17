@@ -17,6 +17,8 @@ export interface ObjectStorage {
     size: number,
     expiresInSeconds: number,
   ): Promise<string>;
+  /** The whole object. Only for server-side processing, such as tagging; never for serving clients. */
+  get(key: string): Promise<Uint8Array>;
   /** The object's metadata, or null if it does not exist. Does not read the body. */
   head(key: string): Promise<StoredObject | null>;
   delete(key: string): Promise<void>;
