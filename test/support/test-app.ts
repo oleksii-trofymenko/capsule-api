@@ -10,21 +10,25 @@ import {
   MODEL_PROVIDERS,
   type ModelProvider,
 } from '../../src/models/providers/model-provider.js';
+import { OBJECT_STORAGE } from '../../src/storage/object-storage.js';
 import { TEST_ENV } from './env.js';
+import { FakeObjectStorage } from './fake-object-storage.js';
 import { FakeProvider } from './fake-provider.js';
 import { createTestDb } from './test-db.js';
 
 export interface TestApp {
   app: INestApplication<App>;
+  storage: FakeObjectStorage;
   close: () => Promise<void>;
 }
 
-/** The full application, with only the database driver and the model vendor swapped. */
+/** The full application, with only the database driver, the model vendor and the photo store swapped. */
 export async function createTestApp(
   envOverrides: Record<string, string> = {},
   provider: ModelProvider = new FakeProvider(),
 ): Promise<TestApp> {
   const { db, close: closeDb } = await createTestDb();
+  const storage = new FakeObjectStorage();
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(ENV)
     .useValue(parseEnv({ ...TEST_ENV, ...envOverrides }))
@@ -34,6 +38,8 @@ export async function createTestApp(
     .useValue(db)
     .overrideProvider(MODEL_PROVIDERS)
     .useValue([provider])
+    .overrideProvider(OBJECT_STORAGE)
+    .useValue(storage)
     .compile();
 
   const app = moduleRef.createNestApplication<INestApplication<App>>({
@@ -43,6 +49,7 @@ export async function createTestApp(
   await app.init();
   return {
     app,
+    storage,
     close: async () => {
       await app.close();
       await closeDb();

@@ -21,7 +21,7 @@ NestJS 12 is newer than most training data. Check the installed package's types 
 
 | Command | Use |
 |---|---|
-| `npm run setup` | First-time setup: creates `.env`, starts Postgres and SeaweedFS, applies migrations. Safe to re-run |
+| `npm run setup` | First-time setup: creates `.env`, starts Postgres and SeaweedFS, applies migrations, creates the photo bucket. Safe to re-run |
 | `npm run start:dev` | Run with reload |
 | `npm run check` | Format, lint, typecheck, all tests, build. Must pass before work is done |
 | `npm run test:unit` / `test:int` / `test:e2e` | One test layer |

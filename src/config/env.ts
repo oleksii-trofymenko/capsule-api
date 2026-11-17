@@ -37,6 +37,13 @@ export const envSchema = z
     MODEL_VISION: modelSpec.default('ollama:gemma4:12b'),
     MODEL_REASONING: modelSpec.default('ollama:gemma4:12b'),
     MODEL_EMBEDDING: modelSpec.default('ollama:nomic-embed-text'),
+
+    /** S3-compatible photo storage. Clients upload to it directly, so it must be reachable from them. */
+    S3_ENDPOINT: z.string().url().default('http://127.0.0.1:8333'),
+    S3_REGION: z.string().min(1).default('us-east-1'),
+    S3_BUCKET: z.string().min(3).default('capsule-photos'),
+    S3_ACCESS_KEY_ID: z.string().min(1),
+    S3_SECRET_ACCESS_KEY: z.string().min(8),
   })
   .superRefine((env, ctx) => {
     if (env.NODE_ENV !== 'production') return;

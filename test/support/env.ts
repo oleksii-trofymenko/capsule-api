@@ -7,6 +7,8 @@ export const TEST_ENV = {
   RATE_LIMIT_PER_MINUTE: '1000',
   AUTH_RATE_LIMIT_PER_MINUTE: '1000',
   OLLAMA_BASE_URL: 'http://127.0.0.1:1',
+  S3_ACCESS_KEY_ID: 'test-access-key',
+  S3_SECRET_ACCESS_KEY: 'test-secret-key',
 } as const;
 
 Object.assign(process.env, TEST_ENV);

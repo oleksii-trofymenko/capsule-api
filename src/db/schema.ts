@@ -1,4 +1,11 @@
-import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -32,4 +39,27 @@ export const refreshTokens = pgTable(
   ],
 );
 
+export const photos = pgTable(
+  'photos',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    /** Key in the photo bucket. The photo itself never enters the database. */
+    storageKey: text('storage_key').notNull().unique(),
+    contentType: text('content_type').notNull(),
+    sizeBytes: integer('size_bytes').notNull(),
+    status: text('status', { enum: ['pending', 'uploaded'] })
+      .notNull()
+      .default('pending'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    uploadedAt: timestamp('uploaded_at', { withTimezone: true }),
+  },
+  (t) => [index('photos_user_idx').on(t.userId)],
+);
+
 export type User = typeof users.$inferSelect;
+export type PhotoRow = typeof photos.$inferSelect;

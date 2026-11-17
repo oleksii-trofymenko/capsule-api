@@ -3,6 +3,8 @@ import { parseEnv } from './env.js';
 const base = {
   DATABASE_URL: 'postgres://u:p@localhost:5432/capsule',
   JWT_ACCESS_SECRET: 'a'.repeat(32),
+  S3_ACCESS_KEY_ID: 'test-access-key',
+  S3_SECRET_ACCESS_KEY: 'test-secret-key',
 };
 
 describe('parseEnv', () => {
@@ -14,6 +16,8 @@ describe('parseEnv', () => {
       CORS_ORIGINS: [],
       MODEL_VISION: 'ollama:gemma4:12b',
       OLLAMA_BASE_URL: 'http://localhost:11434',
+      S3_ENDPOINT: 'http://127.0.0.1:8333',
+      S3_BUCKET: 'capsule-photos',
     });
   });
 

@@ -51,6 +51,21 @@ export class MetricsService {
     registers: [this.registry],
   });
 
+  readonly storageRequests = new Counter({
+    name: 'storage_requests_total',
+    help: 'Calls to photo object storage',
+    labelNames: ['operation', 'outcome'] as const,
+    registers: [this.registry],
+  });
+
+  readonly storageDuration = new Histogram({
+    name: 'storage_request_duration_seconds',
+    help: 'Photo object storage call duration in seconds',
+    labelNames: ['operation', 'outcome'] as const,
+    buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5],
+    registers: [this.registry],
+  });
+
   constructor() {
     collectDefaultMetrics({ register: this.registry });
   }

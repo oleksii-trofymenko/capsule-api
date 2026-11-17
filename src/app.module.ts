@@ -9,6 +9,7 @@ import { DbModule } from './db/db.module.js';
 import { HealthController } from './health/health.controller.js';
 import { MetricsModule } from './metrics/metrics.module.js';
 import { ModelsModule } from './models/models.module.js';
+import { PhotosModule } from './photos/photos.module.js';
 import { PlaygroundModule } from './playground/playground.module.js';
 
 @Module({
@@ -31,6 +32,7 @@ import { PlaygroundModule } from './playground/playground.module.js';
     AuthModule,
     ModelsModule,
     PlaygroundModule,
+    PhotosModule,
   ],
   controllers: [HealthController],
   // Order matters: rate limiting runs before authentication.

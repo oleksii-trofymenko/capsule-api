@@ -44,13 +44,19 @@ for (const [name, make] of Object.entries(GENERATED)) {
     added.push(name);
   }
 }
-const missing = [...parseNames(readFileSync('.env.example', 'utf8')).keys()].filter(
-  (name) => !have.has(name) && !added.includes(name),
-);
+// Variables added to .env.example later, with a local default: copy them across.
+const example = parseNames(readFileSync('.env.example', 'utf8'));
+for (const [name, value] of example) {
+  if (!have.has(name) && !added.includes(name) && value) {
+    current = `${current.replace(/\n*$/, '\n')}${name}=${value}\n`;
+    added.push(name);
+  }
+}
+const missing = [...example.keys()].filter((name) => !have.has(name) && !added.includes(name));
 if (added.length > 0) writeFileSync('.env', current, { mode: 0o600 });
 console.log(
   '.env already exists; left as it is' +
-    (added.length ? `, generated: ${added.join(', ')}` : '') +
+    (added.length ? `, added: ${added.join(', ')}` : '') +
     (missing.length ? `. Not set (defaults apply): ${missing.join(', ')}` : '') +
     '.',
 );
