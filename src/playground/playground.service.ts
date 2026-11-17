@@ -12,7 +12,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ModelRouter } from '../models/model-router.service.js';
 import type { ChatEvent, ChatRequest } from './playground.schemas.js';
 import { createPlaygroundTools } from './playground.tools.js';
-import { systemPrompts } from './prompts/system.js';
+import { stylistPersona } from '../stylist/persona.js';
 
 /** Stops a model that keeps calling tools without ever answering. */
 const MAX_MODEL_CALLS = 6;
@@ -52,7 +52,7 @@ export class PlaygroundService {
     const started = performance.now();
     const elapsed = () => Math.round(performance.now() - started);
     const route = this.models.describe().reasoning;
-    const systemPrompt = request.systemPrompt?.trim() || systemPrompts.en;
+    const systemPrompt = request.systemPrompt?.trim() || stylistPersona.en;
     const tools = request.tools ? this.tools : [];
 
     yield {
