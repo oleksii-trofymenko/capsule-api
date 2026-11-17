@@ -23,10 +23,12 @@ const item = (
   formality: OutfitItem['formality'],
 ): OutfitItem => ({ name, category, colour, formality });
 
+// Formality as the playground's sample wardrobe tags these pieces.
 const blazer = item('Navy wool blazer', 'outerwear', 'navy', 'formal');
-const shirt = item('White cotton shirt', 'top', 'white', 'formal');
+const shirt = item('White cotton shirt', 'top', 'white', 'smart');
 const trousers = item('Charcoal wool trousers', 'bottom', 'charcoal', 'formal');
-const brogues = item('Black leather brogues', 'shoes', 'black', 'formal');
+const brogues = item('Black leather brogues', 'shoes', 'black', 'smart');
+const tie = item('Burgundy knitted tie', 'accessory', 'burgundy', 'smart');
 const trainers = item('White leather trainers', 'shoes', 'white', 'casual');
 const overcoat = item('Camel wool overcoat', 'outerwear', 'camel', 'smart');
 
@@ -68,6 +70,31 @@ describe('OccasionsService.check', () => {
     ).toEqual([]);
   });
 
+  it("passes the stylist's own wedding outfit, as the sample wardrobe tags it", () => {
+    expect(
+      occasions.check(
+        'wedding-guest',
+        [blazer, shirt, trousers, brogues, tie],
+        'en',
+      ),
+    ).toEqual([]);
+  });
+
+  it('asks black tie for formal tailoring, not a formal shirt and shoes', () => {
+    expect(
+      occasions.check('black-tie', [blazer, shirt, trousers, brogues], 'en'),
+    ).toEqual([]);
+    const chinos = item('Navy chinos', 'bottom', 'navy', 'smart');
+    expect(
+      occasions
+        .check('black-tie', [blazer, shirt, chinos, brogues], 'en')
+        .map((b) => [b.ruleId, b.items]),
+    ).toEqual([
+      ['formal', ['Navy chinos']],
+      ['no-casual-pieces', ['Navy chinos']],
+    ]);
+  });
+
   it('explains why trainers do not work at a wedding', () => {
     expect(
       occasions.check(
@@ -77,9 +104,9 @@ describe('OccasionsService.check', () => {
       ),
     ).toEqual([
       {
-        ruleId: 'formal',
+        ruleId: 'smart',
         items: ['White leather trainers'],
-        message: 'Wear formal pieces.',
+        message: 'Keep every piece smart or formal.',
       },
       {
         ruleId: 'no-casual-pieces',

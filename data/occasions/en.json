@@ -8,7 +8,7 @@
     ],
     "guidance": "Tailored and celebratory. A suit or blazer with smart trousers, or a dress. Leave white to the couple.",
     "rules": {
-      "formal": "Wear formal pieces.",
+      "smart": "Keep every piece smart or formal.",
       "no-white": "Do not wear white, ivory or cream as the main colour.",
       "no-casual-pieces": "No jeans, trainers, hoodies or t-shirts."
     }
@@ -23,7 +23,7 @@
     ],
     "guidance": "The most formal evening dress: a dinner suit with a bow tie, or a floor-length gown.",
     "rules": {
-      "formal": "Wear formal pieces only.",
+      "formal": "Formal trousers or skirt, dress and jacket.",
       "no-casual-pieces": "No jeans, trainers, chinos, boots, hoodies or t-shirts."
     }
   },

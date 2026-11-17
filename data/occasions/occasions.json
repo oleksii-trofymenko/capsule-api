@@ -4,7 +4,7 @@
       "id": "wedding-guest",
       "formality": "formal",
       "rules": [
-        { "id": "formal", "type": "minFormality", "level": "formal" },
+        { "id": "smart", "type": "minFormality", "level": "smart" },
         { "id": "no-white", "type": "forbidMainColour", "colours": ["white", "ivory", "cream", "off-white"] },
         { "id": "no-casual-pieces", "type": "forbidItems", "words": ["jeans", "denim", "trainer", "sneaker", "hoodie", "t-shirt"] }
       ]
@@ -13,7 +13,7 @@
       "id": "black-tie",
       "formality": "formal",
       "rules": [
-        { "id": "formal", "type": "minFormality", "level": "formal" },
+        { "id": "formal", "type": "minFormality", "level": "formal", "categories": ["bottom", "dress", "outerwear"] },
         { "id": "no-casual-pieces", "type": "forbidItems", "words": ["jeans", "denim", "trainer", "sneaker", "hoodie", "t-shirt", "chino", "boot"] }
       ]
     },

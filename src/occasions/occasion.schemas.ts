@@ -5,9 +5,22 @@ const id = z.string().regex(/^[a-z0-9-]+$/, 'ids are lower-case-with-dashes');
 /** Lower-case words matched against item names and colours. */
 const words = z.array(z.string().regex(/^[a-z-]+$/)).min(1);
 
+/** Which garments a rule looks at. Formality rules default to every category but accessories. */
+const categories = z.array(z.enum(CATEGORIES)).min(1);
+
 export const ruleSchema = z.discriminatedUnion('type', [
-  z.object({ id, type: z.literal('minFormality'), level: z.enum(FORMALITIES) }),
-  z.object({ id, type: z.literal('maxFormality'), level: z.enum(FORMALITIES) }),
+  z.object({
+    id,
+    type: z.literal('minFormality'),
+    level: z.enum(FORMALITIES),
+    categories: categories.optional(),
+  }),
+  z.object({
+    id,
+    type: z.literal('maxFormality'),
+    level: z.enum(FORMALITIES),
+    categories: categories.optional(),
+  }),
   /** No item whose name contains one of these words. */
   z.object({ id, type: z.literal('forbidItems'), words }),
   /** The outfit's main colour (dress, else outer layer, else top) is none of these. */
@@ -17,7 +30,7 @@ export const ruleSchema = z.discriminatedUnion('type', [
     id,
     type: z.literal('onlyColours'),
     colours: words,
-    categories: z.array(z.enum(CATEGORIES)).min(1),
+    categories,
   }),
 ]);
 

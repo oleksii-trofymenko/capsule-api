@@ -1,4 +1,4 @@
-import type { CATEGORIES, FORMALITIES } from '../db/schema.js';
+import { CATEGORIES, type FORMALITIES } from '../db/schema.js';
 import { normalise } from './normalise.js';
 import type { Rule } from './occasion.schemas.js';
 
@@ -17,6 +17,8 @@ export interface Violation {
 }
 
 const RANK = { casual: 0, smart: 1, formal: 2 } as const;
+/** A belt or watch should not fail a formal outfit, so formality rules skip accessories unless told otherwise. */
+const CLOTHING = CATEGORIES.filter((c) => c !== 'accessory');
 /** The garment that sets an outfit's main colour, in order of precedence. */
 const MAIN_COLOUR_FROM = ['dress', 'outerwear', 'top'] as const;
 
@@ -44,9 +46,14 @@ const anyLeading = (colour: string, list: string[]) =>
 function breaking(rule: Rule, items: OutfitItem[]): OutfitItem[] {
   switch (rule.type) {
     case 'minFormality':
-      return items.filter((i) => RANK[i.formality] < RANK[rule.level]);
-    case 'maxFormality':
-      return items.filter((i) => RANK[i.formality] > RANK[rule.level]);
+    case 'maxFormality': {
+      const scope: readonly string[] = rule.categories ?? CLOTHING;
+      const tooFar =
+        rule.type === 'minFormality'
+          ? (i: OutfitItem) => RANK[i.formality] < RANK[rule.level]
+          : (i: OutfitItem) => RANK[i.formality] > RANK[rule.level];
+      return items.filter((i) => scope.includes(i.category) && tooFar(i));
+    }
     case 'forbidItems':
       return items.filter((i) => anyMentioned(i.name, rule.words));
     case 'forbidMainColour': {

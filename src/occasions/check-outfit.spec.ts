@@ -43,6 +43,20 @@ describe('checkOutfit', () => {
     ]);
   });
 
+  it('leaves accessories out of formality rules unless the rule lists them', () => {
+    const belt = item('Brown leather belt', 'accessory', 'brown', 'casual');
+    const min: Rule = { id: 'formal', type: 'minFormality', level: 'formal' };
+    expect(checkOutfit([min], [blazer, trousers, belt])).toEqual([]);
+    const scoped: Rule = { ...min, categories: ['bottom', 'outerwear'] };
+    expect(checkOutfit([scoped], [blazer, trousers, shirt, trainers])).toEqual(
+      [],
+    );
+    const withBelts: Rule = { ...min, categories: ['accessory'] };
+    expect(checkOutfit([withBelts], [belt])).toEqual([
+      { ruleId: 'formal', items: ['Brown leather belt'] },
+    ]);
+  });
+
   it('flags items whose names contain a forbidden word', () => {
     const rule: Rule = {
       id: 'no-casual',
