@@ -52,6 +52,8 @@ export type StylistEvent =
   | { type: 'step'; step: StylistStep }
   | {
       type: 'outfit';
+      /** The saved outfit, for feedback; null when nothing was chosen or saving failed. */
+      id: string | null;
       occasion: string | null;
       items: { id: string; name: string }[];
       removed: { name: string; reason: string }[];

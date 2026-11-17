@@ -11,6 +11,7 @@ import { MetricsModule } from '../metrics/metrics.module.js';
 import { ModelRouter } from '../models/model-router.service.js';
 import { ModelsModule } from '../models/models.module.js';
 import { OccasionsModule } from '../occasions/occasions.module.js';
+import { OUTFIT_STORE, type OutfitStore } from '../outfits/outfit-store.js';
 import { sampleWardrobe } from '../playground/sample-data.js';
 import type { Locale } from '../locale.js';
 import {
@@ -28,11 +29,18 @@ const sampleContext: StylistContextSource = {
   load: async () => ({ wardrobe: sampleWardrobe, profile: null }),
 };
 
+/** Suggested outfits are kept in memory: the evaluation needs no database. */
+let saved = 0;
+const memoryOutfits: OutfitStore = {
+  save: async () => `eval-outfit-${(saved += 1)}`,
+};
+
 @Module({
   imports: [ConfigModule, MetricsModule, ModelsModule, OccasionsModule],
   providers: [
     StylistService,
     { provide: STYLIST_CONTEXT, useValue: sampleContext },
+    { provide: OUTFIT_STORE, useValue: memoryOutfits },
   ],
 })
 class EvalModule {}

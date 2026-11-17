@@ -9,6 +9,7 @@ import {
   type StylistContext,
   type StylistContextSource,
 } from './context.js';
+import { OUTFIT_STORE, type OutfitStore } from '../outfits/outfit-store.js';
 import { buildStylistGraph, type StylistGraph } from './graph.js';
 import type {
   Consulted,
@@ -28,9 +29,9 @@ export class DbContextSource implements StylistContextSource {
   ) {}
 
   async load(userId: string): Promise<StylistContext> {
-    const [wardrobe, { profile }] = await Promise.all([
+    const [wardrobe, profile] = await Promise.all([
       this.wardrobe.list(userId),
-      this.profiles.get(userId),
+      this.profiles.answers(userId),
     ]);
     return { wardrobe, profile };
   }
@@ -45,6 +46,7 @@ export class StylistService {
     @Inject(ModelRouter) models: ModelRouter,
     @Inject(OccasionsService) occasions: OccasionsService,
     @Inject(STYLIST_CONTEXT) context: StylistContextSource,
+    @Inject(OUTFIT_STORE) private readonly outfits: OutfitStore,
   ) {
     this.graph = buildStylistGraph({
       models,
@@ -78,7 +80,9 @@ export class StylistService {
         // Custom chunks are the StylistEvents the graph's nodes emit.
         const event = chunk as StylistEvent;
         if (event.type === 'token') firstTokenMs ??= elapsed();
-        yield event;
+        yield event.type === 'outfit'
+          ? { ...event, id: await this.save(userId, event) }
+          : event;
       }
       yield { type: 'done', ms: elapsed(), firstTokenMs, consulted };
     } catch (error) {
@@ -91,6 +95,25 @@ export class StylistService {
         type: 'error',
         message: 'The stylist could not answer just now. Please try again.',
       };
+    }
+  }
+
+  /** Saves a suggested outfit so feedback can attach to it. A failure costs the id, not the reply. */
+  private async save(
+    userId: string,
+    event: Extract<StylistEvent, { type: 'outfit' }>,
+  ): Promise<string | null> {
+    if (event.items.length === 0) return null;
+    try {
+      return await this.outfits.save(userId, {
+        occasionId: event.occasion,
+        items: event.items.map((i) => ({ itemId: i.id, name: i.name })),
+      });
+    } catch (error) {
+      this.logger.error(
+        `Saving an outfit failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+      return null;
     }
   }
 }

@@ -4,6 +4,7 @@ import { MetricsService } from '../../src/metrics/metrics.service.js';
 import { ModelRouter } from '../../src/models/model-router.service.js';
 import { readLibrary } from '../../src/occasions/load-occasions.js';
 import { OccasionsService } from '../../src/occasions/occasions.service.js';
+import type { NewOutfit } from '../../src/outfits/outfit-store.js';
 import { sampleWardrobe } from '../../src/playground/sample-data.js';
 import { stylistPrompts } from '../../src/stylist/stylist.prompts.js';
 import type {
@@ -30,10 +31,19 @@ function setup(script: ScriptStep[]) {
     [new FakeProvider([], model)],
     new MetricsService(),
   );
-  const stylist = new StylistService(router, occasions, {
-    load: async () => ({ wardrobe: sampleWardrobe, profile: null }),
-  });
-  return { model, stylist };
+  const saved: NewOutfit[] = [];
+  const stylist = new StylistService(
+    router,
+    occasions,
+    { load: async () => ({ wardrobe: sampleWardrobe, profile: null }) },
+    {
+      save: async (_userId, outfit) => {
+        saved.push(outfit);
+        return `outfit-${saved.length}`;
+      },
+    },
+  );
+  return { model, stylist, saved };
 }
 
 async function run(stylist: StylistService, ...turns: string[]) {
@@ -63,12 +73,25 @@ const picked = (itemIds: string[], missing: string | null = null) => [
 
 describe('Stylist graph', () => {
   it('builds an outfit for a known occasion from allowed, owned items only', async () => {
-    const { model, stylist } = setup([
+    const { model, stylist, saved } = setup([
       understood('outfit'),
       picked(['w08', 'w01', 'w06', 'w12', 'w99']),
       textChunks('Navy wool blazer, ', 'white shirt.'),
     ]);
     const events = await run(stylist, 'What should I wear to a wedding?');
+
+    // The outfit is saved as a snapshot so feedback can attach to it.
+    expect(saved).toEqual([
+      {
+        occasionId: 'wedding-guest',
+        items: [
+          { itemId: 'w08', name: 'Navy wool blazer' },
+          { itemId: 'w01', name: 'White cotton shirt' },
+          { itemId: 'w06', name: 'Charcoal wool trousers' },
+          { itemId: 'w12', name: 'Brown leather brogues' },
+        ],
+      },
+    ]);
 
     expect(steps(events)).toEqual([
       'load-context',
@@ -81,6 +104,7 @@ describe('Stylist graph', () => {
     const outfit = events.find((e) => e.type === 'outfit');
     expect(outfit).toEqual({
       type: 'outfit',
+      id: 'outfit-1',
       occasion: 'wedding-guest',
       items: [
         { id: 'w08', name: 'Navy wool blazer' },
@@ -140,6 +164,37 @@ describe('Stylist graph', () => {
     );
   });
 
+  it('still replies when saving the outfit fails, with no id to attach feedback to', async () => {
+    const model = new ScriptedChatModel([
+      understood('outfit'),
+      picked(['w08', 'w06']),
+      textChunks('Blazer and trousers.'),
+    ]);
+    const router = new ModelRouter(
+      parseEnv(TEST_ENV),
+      [new FakeProvider([], model)],
+      new MetricsService(),
+    );
+    const stylist = new StylistService(
+      router,
+      occasions,
+      { load: async () => ({ wardrobe: sampleWardrobe, profile: null }) },
+      {
+        save: async () => {
+          throw new Error('database down');
+        },
+      },
+    );
+    const events = await run(stylist, 'Office outfit for Monday?');
+
+    expect(events.find((e) => e.type === 'outfit')).toMatchObject({
+      id: null,
+      items: [{ id: 'w08' }, { id: 'w06' }],
+    });
+    expect(reply(events)).toBe('Blazer and trousers.');
+    expect(events.at(-1)?.type).toBe('done');
+  });
+
   it('tries compose again after invalid output, and reads "null" as nothing missing', async () => {
     const { model, stylist } = setup([
       understood('outfit'),
@@ -157,17 +212,18 @@ describe('Stylist graph', () => {
   });
 
   it('asks one question when an outfit request gives nothing to go on', async () => {
-    const { model, stylist } = setup([understood('outfit', false)]);
+    const { model, stylist, saved } = setup([understood('outfit', false)]);
     const events = await run(stylist, "I'm going out.");
 
     expect(steps(events)).toEqual(['load-context', 'understand', 'clarify']);
     expect(reply(events)).toBe(stylistPrompts.en.clarify);
     expect(model.received).toHaveLength(1);
     expect(events.at(-1)).toMatchObject({ type: 'done', consulted: [] });
+    expect(saved).toEqual([]);
   });
 
   it('answers a question with the whole wardrobe in view, by name', async () => {
-    const { model, stylist } = setup([
+    const { model, stylist, saved } = setup([
       understood('question'),
       textChunks('You own the Olive waxed jacket.'),
     ]);
@@ -175,6 +231,7 @@ describe('Stylist graph', () => {
 
     expect(steps(events)).toEqual(['load-context', 'understand', 'answer']);
     expect(reply(events)).toBe('You own the Olive waxed jacket.');
+    expect(saved).toEqual([]);
     const answer = systemText(model.received[1]);
     for (const item of sampleWardrobe) expect(answer).toContain(item.name);
     expect(answer).not.toMatch(/\bw\d{2}\b/);
