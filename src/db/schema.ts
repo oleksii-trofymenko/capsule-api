@@ -1,5 +1,6 @@
 import {
   boolean,
+  date,
   index,
   integer,
   jsonb,
@@ -7,6 +8,7 @@ import {
   text,
   timestamp,
   uuid,
+  vector,
 } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
@@ -224,8 +226,58 @@ export const outfits = pgTable(
   (t) => [index('outfits_user_idx').on(t.userId)],
 );
 
+/**
+ * Length of the embedding vectors. It belongs to the embedding model
+ * (nomic-embed-text gives 768): a model with another length needs a migration.
+ */
+export const EMBEDDING_DIMENSIONS = 768;
+
+/** Where knowledge comes from. Only sources listed in docs/SOURCES.md may be ingested (T15). */
+export const knowledgeSources = pgTable('knowledge_sources', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  /** Null for sources with no address, such as a book. */
+  url: text('url'),
+  licence: text('licence').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/** Shared knowledge, not user data: passages belong to sources, never to a user. */
+export const knowledgePassages = pgTable(
+  'knowledge_passages',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    sourceId: uuid('source_id')
+      .notNull()
+      .references(() => knowledgeSources.id, { onDelete: 'cascade' }),
+    text: text('text').notNull(),
+    /** When the source published it: retrieval prefers recent passages. */
+    publishedOn: date('published_on', { mode: 'string' }).notNull(),
+    /** Trend records name the seasons they apply to; empty means any season. */
+    seasons: text('seasons', { enum: SEASONS }).array().notNull().default([]),
+    embedding: vector('embedding', {
+      dimensions: EMBEDDING_DIMENSIONS,
+    }).notNull(),
+    /** Vectors from different models cannot be compared, so each row says which made it. */
+    embeddingModel: text('embedding_model').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index('knowledge_passages_source_idx').on(t.sourceId),
+    index('knowledge_passages_embedding_idx').using(
+      'hnsw',
+      t.embedding.op('vector_cosine_ops'),
+    ),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type PhotoRow = typeof photos.$inferSelect;
 export type WardrobeItemRow = typeof wardrobeItems.$inferSelect;
 export type StyleProfileRow = typeof styleProfiles.$inferSelect;
 export type OutfitRow = typeof outfits.$inferSelect;
+export type KnowledgePassageRow = typeof knowledgePassages.$inferSelect;
