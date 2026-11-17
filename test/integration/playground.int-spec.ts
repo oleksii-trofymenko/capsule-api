@@ -7,6 +7,7 @@ import type {
   ChatRequest,
 } from '../../src/playground/playground.schemas.js';
 import { PlaygroundService } from '../../src/playground/playground.service.js';
+import { stylistPersona } from '../../src/stylist/persona.js';
 import { TEST_ENV } from '../support/env.js';
 import { FakeProvider } from '../support/fake-provider.js';
 import {
@@ -148,11 +149,11 @@ describe('PlaygroundService', () => {
     expect(ofType(events, 'done')[0].modelCalls).toBe(6);
   });
 
-  it('sends the default system prompt first, or the override when one is given', async () => {
+  it('sends the stylist persona first, or the override when one is given', async () => {
     const a = setup([textChunks('ok')]);
     await run(a.service);
     expect(a.model.received[0][0].getType()).toBe('system');
-    expect(a.model.received[0][0].text).toContain('You are Capsule');
+    expect(a.model.received[0][0].text).toBe(stylistPersona.en);
 
     const b = setup([textChunks('ok')]);
     const events = await run(b.service, {
