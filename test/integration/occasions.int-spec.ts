@@ -61,6 +61,7 @@ describe('OccasionsService.find', () => {
     ['Christmas holiday party', undefined],
     ['What should I wear to work out at the gym?', undefined],
     ['What should I wear when I wake up?', undefined],
+    ['What do I wear for my walk to work?', undefined],
   ])('does not let a generic word pick the occasion: %s', (phrase, id) => {
     expect(occasions.find(phrase, 'en')?.id).toBe(id);
   });

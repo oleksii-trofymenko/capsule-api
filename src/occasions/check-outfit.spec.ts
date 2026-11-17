@@ -101,6 +101,28 @@ describe('checkOutfit', () => {
     expect(checkOutfit([rule], [whiteCoat, blazer, shirt])).toEqual(flagged);
   });
 
+  it('reads the first colour named, whatever words describe it', () => {
+    const noWhite: Rule = {
+      id: 'no-white',
+      type: 'forbidMainColour',
+      colours: ['white'],
+    };
+    const crisp = item('Silk dress', 'dress', 'crisp white', 'formal');
+    expect(checkOutfit([noWhite], [crisp])).toEqual([
+      { ruleId: 'no-white', items: ['Silk dress'] },
+    ]);
+    const slashed = item('Silk dress', 'dress', 'black/white', 'formal');
+    expect(checkOutfit([noWhite], [slashed])).toEqual([]);
+    const dark: Rule = {
+      id: 'dark',
+      type: 'onlyColours',
+      colours: ['navy'],
+      categories: ['bottom'],
+    };
+    const deep = item('Wool trousers', 'bottom', 'deep navy');
+    expect(checkOutfit([dark], [deep])).toEqual([]);
+  });
+
   it('reads a colour by its leading words', () => {
     const rule: Rule = {
       id: 'dark',

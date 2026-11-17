@@ -34,14 +34,17 @@ export function mentions(text: string, word: string): boolean {
   return new RegExp(`(^| )${pattern(word)}(s|es)?( |$)`).test(normalise(text));
 }
 
-/** A colour is read by its leading words: "black and white" is black, "off-white" is off-white. */
-const leadsWith = (colour: string, word: string) =>
-  new RegExp(`^${pattern(word)}(s|es)?( |$)`).test(normalise(colour));
+/**
+ * An item's colour is the first one it names: "black and white" and
+ * "black/white" are black, while "crisp white" and "deep navy" keep their colour.
+ */
+const firstColour = (colour: string) =>
+  colour.split(/,|&|\/|\+|\band\b|\bwith\b/i)[0];
 
 const anyMentioned = (text: string, list: string[]) =>
   list.some((word) => mentions(text, word));
-const anyLeading = (colour: string, list: string[]) =>
-  list.some((word) => leadsWith(colour, word));
+const isAnyOf = (colour: string, list: string[]) =>
+  anyMentioned(firstColour(colour), list);
 
 function breaking(rule: Rule, items: OutfitItem[]): OutfitItem[] {
   switch (rule.type) {
@@ -62,18 +65,19 @@ function breaking(rule: Rule, items: OutfitItem[]): OutfitItem[] {
         items.some((i) => i.category === c),
       );
       return items.filter(
-        (i) => i.category === category && anyLeading(i.colour, rule.colours),
+        (i) => i.category === category && isAnyOf(i.colour, rule.colours),
       );
     }
     case 'onlyColours':
       return items.filter(
         (i) =>
           rule.categories.includes(i.category) &&
-          !anyLeading(i.colour, rule.colours),
+          !isAnyOf(i.colour, rule.colours),
       );
   }
 }
 
+/** Every rule of the occasion that the outfit breaks. Enforced here, not by the prompt. */
 export function checkOutfit(rules: Rule[], items: OutfitItem[]): Violation[] {
   return rules.flatMap((rule) => {
     const bad = breaking(rule, items);
