@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { photoTagsSchema } from '../tagging/tagging.schemas.js';
 
 /** Formats phone cameras and browsers produce. HEIC is the iPhone default. */
 export const PHOTO_TYPES = [
@@ -33,6 +34,14 @@ export const photoSchema = z.object({
   size: z.number().int(),
   createdAt: z.iso.datetime(),
   uploadedAt: z.iso.datetime().nullable(),
+  tagStatus: z
+    .enum(['pending', 'tagged', 'failed'])
+    .describe(
+      'Tagging starts after upload; poll until it is no longer pending',
+    ),
+  suggestedTags: photoTagsSchema
+    .nullable()
+    .describe('Pre-fill for the wardrobe item; the user corrects it there'),
 });
 
 export const photoUploadSchema = z.object({

@@ -1,6 +1,7 @@
 import {
   index,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -39,6 +40,28 @@ export const refreshTokens = pgTable(
   ],
 );
 
+export const CATEGORIES = [
+  'top',
+  'bottom',
+  'dress',
+  'outerwear',
+  'shoes',
+  'accessory',
+] as const;
+export const FORMALITIES = ['casual', 'smart', 'formal'] as const;
+export const SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;
+/** INT is letter sizing (XS to XXL). A size is meaningless without its system. */
+export const SIZE_SYSTEMS = ['UK', 'EU', 'US', 'INT'] as const;
+
+/** What the vision model suggested for a photo. Same fields a wardrobe item starts from. */
+export interface PhotoTags {
+  name: string;
+  category: (typeof CATEGORIES)[number];
+  colour: string;
+  formality: (typeof FORMALITIES)[number];
+  seasons: (typeof SEASONS)[number][];
+}
+
 export const photos = pgTable(
   'photos',
   {
@@ -57,22 +80,17 @@ export const photos = pgTable(
       .notNull()
       .defaultNow(),
     uploadedAt: timestamp('uploaded_at', { withTimezone: true }),
+    tagStatus: text('tag_status', { enum: ['pending', 'tagged', 'failed'] })
+      .notNull()
+      .default('pending'),
+    /** The model's suggestion, kept as it was so user corrections can be measured against it. */
+    tags: jsonb('tags').$type<PhotoTags>(),
+    /** `provider:model` that produced the tags. */
+    tagModel: text('tag_model'),
+    taggedAt: timestamp('tagged_at', { withTimezone: true }),
   },
   (t) => [index('photos_user_idx').on(t.userId)],
 );
-
-export const CATEGORIES = [
-  'top',
-  'bottom',
-  'dress',
-  'outerwear',
-  'shoes',
-  'accessory',
-] as const;
-export const FORMALITIES = ['casual', 'smart', 'formal'] as const;
-export const SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;
-/** INT is letter sizing (XS to XXL). A size is meaningless without its system. */
-export const SIZE_SYSTEMS = ['UK', 'EU', 'US', 'INT'] as const;
 
 export const wardrobeItems = pgTable(
   'wardrobe_items',

@@ -66,6 +66,21 @@ export class MetricsService {
     registers: [this.registry],
   });
 
+  readonly photoTagging = new Counter({
+    name: 'photo_tagging_total',
+    help: 'Photos processed by vision tagging',
+    labelNames: ['outcome'] as const,
+    registers: [this.registry],
+  });
+
+  readonly photoTaggingDuration = new Histogram({
+    name: 'photo_tagging_duration_seconds',
+    help: 'Time to tag one photo, including reading it from storage',
+    labelNames: ['outcome'] as const,
+    buckets: [0.5, 1, 2, 5, 10, 20, 40, 80, 160],
+    registers: [this.registry],
+  });
+
   constructor() {
     collectDefaultMetrics({ register: this.registry });
   }

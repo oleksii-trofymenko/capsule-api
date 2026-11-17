@@ -45,6 +45,8 @@ describe('Photos API', () => {
       size: 3_200_000,
       createdAt: expect.any(String),
       uploadedAt: null,
+      tagStatus: 'pending',
+      suggestedTags: null,
     });
     expect(body.upload).toMatchObject({
       method: 'PUT',
@@ -81,8 +83,13 @@ describe('Photos API', () => {
       uploadedAt: expect.any(String),
     });
 
+    // Tagging runs in the background meanwhile, so compare the upload, not the tags.
     const again = await complete(token, photo.id).expect(200);
-    expect(again.body).toEqual(done.body);
+    expect(again.body).toMatchObject({
+      id: photo.id,
+      status: 'uploaded',
+      uploadedAt: done.body.uploadedAt,
+    });
   });
 
   it('rejects and removes a stored file that differs from what was declared', async () => {

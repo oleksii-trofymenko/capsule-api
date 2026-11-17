@@ -9,6 +9,7 @@ import { and, eq } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { DB, type Db } from '../db/db.module.js';
 import { photos, type PhotoRow } from '../db/schema.js';
+import { TaggingService } from '../tagging/tagging.service.js';
 import {
   OBJECT_STORAGE,
   type ObjectStorage,
@@ -29,6 +30,8 @@ const toPhoto = (row: PhotoRow): Photo => ({
   size: row.sizeBytes,
   createdAt: row.createdAt.toISOString(),
   uploadedAt: row.uploadedAt?.toISOString() ?? null,
+  tagStatus: row.tagStatus,
+  suggestedTags: row.tags,
 });
 
 @Injectable()
@@ -36,6 +39,7 @@ export class PhotosService {
   constructor(
     @Inject(DB) private readonly db: Db,
     @Inject(OBJECT_STORAGE) private readonly storage: ObjectStorage,
+    @Inject(TaggingService) private readonly tagging: TaggingService,
   ) {}
 
   async createUpload(
@@ -74,14 +78,13 @@ export class PhotosService {
     };
   }
 
-  /** Confirms the upload by reading the object's metadata. Safe to call twice. */
+  async get(userId: string, id: string): Promise<Photo> {
+    return toPhoto(await this.find(userId, id));
+  }
+
+  /** Confirms the upload by reading the object's metadata, then queues tagging. Safe to call twice. */
   async complete(userId: string, id: string): Promise<Photo> {
-    const [row] = await this.db
-      .select()
-      .from(photos)
-      .where(and(eq(photos.id, id), eq(photos.userId, userId)))
-      .limit(1);
-    if (!row) throw new NotFoundException('Photo not found');
+    const row = await this.find(userId, id);
     if (row.status === 'uploaded') return toPhoto(row);
 
     const stored = await this.storage.head(row.storageKey);
@@ -104,6 +107,17 @@ export class PhotosService {
       .set({ status: 'uploaded', uploadedAt: new Date() })
       .where(and(eq(photos.id, id), eq(photos.userId, userId)))
       .returning();
+    this.tagging.enqueue(id);
     return toPhoto(updated);
+  }
+
+  private async find(userId: string, id: string): Promise<PhotoRow> {
+    const [row] = await this.db
+      .select()
+      .from(photos)
+      .where(and(eq(photos.id, id), eq(photos.userId, userId)))
+      .limit(1);
+    if (!row) throw new NotFoundException('Photo not found');
+    return row;
   }
 }
