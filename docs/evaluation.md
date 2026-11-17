@@ -4,6 +4,9 @@
 any change to a prompt, the graph, retrieval or a model, and put the score in the commit or pull
 request. A change that lowers the score beyond the run-to-run spread below is not finished.
 
+**Current reference: 94.2 ±1.2, the stylist graph (T11).** Compare changes with that. The T04
+baseline (92.0, the old playground chat) is kept below as history.
+
 It needs Ollama with the configured models. It does not need the database or the API server.
 A run takes about four minutes on the development machine. Full replies and verdicts are written
 to `eval-results/`, which git ignores.
