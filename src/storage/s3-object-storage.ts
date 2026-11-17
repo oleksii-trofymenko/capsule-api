@@ -29,6 +29,8 @@ export class S3ObjectStorage implements ObjectStorage {
       // By default the SDK adds a checksum to presigned uploads, computed for an
       // empty body, so every real upload would fail with BadDigest.
       requestChecksumCalculation: 'WHEN_REQUIRED',
+      // Likewise, download URLs would carry a checksum-mode parameter browsers have no use for.
+      responseChecksumValidation: 'WHEN_REQUIRED',
       credentials: {
         accessKeyId: env.S3_ACCESS_KEY_ID,
         secretAccessKey: env.S3_SECRET_ACCESS_KEY,
@@ -53,6 +55,14 @@ export class S3ObjectStorage implements ObjectStorage {
       expiresIn: expiresInSeconds,
       signableHeaders: new Set(['content-type', 'content-length']),
     });
+  }
+
+  presignDownload(key: string, expiresInSeconds: number) {
+    return getSignedUrl(
+      this.s3,
+      new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+      { expiresIn: expiresInSeconds },
+    );
   }
 
   get(key: string): Promise<Uint8Array> {

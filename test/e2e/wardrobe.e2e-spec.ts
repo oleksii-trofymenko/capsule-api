@@ -61,6 +61,7 @@ describe('Wardrobe API', () => {
       ...blazer,
       size: { system: 'UK', value: '40R' },
       photoId: null,
+      photoUrl: null,
       createdAt: expect.any(String),
       updatedAt: expect.any(String),
     });
@@ -133,6 +134,12 @@ describe('Wardrobe API', () => {
       .send({ ...blazer, photoId: own })
       .expect(201);
     expect(linked.body.photoId).toBe(own);
+    // A short-lived link to the photo comes with the item, on create and on list.
+    const photoUrl = `https://storage.test/photos/${own}?X-Amz-Expires=900&download`;
+    expect(linked.body.photoUrl).toBe(photoUrl);
+    expect(
+      (await ana.get('/v1/wardrobe/items').expect(200)).body.items,
+    ).toEqual([expect.objectContaining({ id: linked.body.id, photoUrl })]);
 
     for (const photoId of [pending.body.photo.id, bens, missingId]) {
       await ana
@@ -153,6 +160,7 @@ describe('Wardrobe API', () => {
       .send({ photoId: null })
       .expect(200);
     expect(unlinked.body.photoId).toBeNull();
+    expect(unlinked.body.photoUrl).toBeNull();
   });
 
   it('requires a token', async () => {

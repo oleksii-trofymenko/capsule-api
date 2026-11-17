@@ -17,6 +17,8 @@ export interface ObjectStorage {
     size: number,
     expiresInSeconds: number,
   ): Promise<string>;
+  /** A URL that lets a client read the object until it expires. The URL is a credential: never log it. */
+  presignDownload(key: string, expiresInSeconds: number): Promise<string>;
   /** The whole object. Only for server-side processing, such as tagging; never for serving clients. */
   get(key: string): Promise<Uint8Array>;
   /** The object's metadata, or null if it does not exist. Does not read the body. */

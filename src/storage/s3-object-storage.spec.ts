@@ -37,3 +37,15 @@ describe('S3ObjectStorage.presignUpload', () => {
     expect(names.filter((k) => k.includes('checksum'))).toEqual([]);
   });
 });
+
+describe('S3ObjectStorage.presignDownload', () => {
+  it('signs a read of one object for a limited time, with no checksum to fail it', async () => {
+    const url = new URL(await storage.presignDownload('photos/abc', 900));
+    expect(url.origin + url.pathname).toBe(
+      'http://storage.test:8333/photos-bucket/photos/abc',
+    );
+    expect(url.searchParams.get('X-Amz-Expires')).toBe('900');
+    const names = [...url.searchParams.keys()].map((k) => k.toLowerCase());
+    expect(names.filter((k) => k.includes('checksum'))).toEqual([]);
+  });
+});
