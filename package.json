@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "setup": "npm run setup:env && docker compose up -d --wait postgres minio && drizzle-kit migrate",
+    "setup": "npm run setup:env && docker compose up -d --wait postgres seaweedfs && drizzle-kit migrate",
     "setup:env": "node scripts/setup-env.mjs",
     "build": "nest build",
     "start": "nest start",

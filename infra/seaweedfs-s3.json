@@ -1,0 +1,11 @@
+{
+  "identities": [
+    {
+      "name": "capsule-dev",
+      "credentials": [
+        { "accessKey": "capsule", "secretKey": "capsule-dev-secret" }
+      ],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    }
+  ]
+}

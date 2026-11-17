@@ -1,0 +1,1198 @@
+{
+  "model": {
+    "provider": "ollama",
+    "model": "gemma4:12b"
+  },
+  "locale": "en",
+  "summary": {
+    "scenarios": 30,
+    "rules": 93.6,
+    "tone": 75.8,
+    "wearability": 98.4,
+    "score": 89.3,
+    "judgeFailures": 0
+  },
+  "results": [
+    {
+      "id": "wedding",
+      "transcript": {
+        "answer": "Navy wool blazer, White cotton shirt, Charcoal wool trousers, Brown leather brogues, and a Burgundy knitted tie.\n\nThe navy and charcoal combination is a classic formal staple for an autumn wedding, while the burgundy tie adds a seasonal touch of warmth.",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 8312,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls get_dress_code",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions blazer",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "N/A"
+      }
+    },
+    {
+      "id": "interview",
+      "transcript": {
+        "answer": "White cotton shirt, Charcoal wool trousers, Navy wool blazer, Brown leather brogues.\n\nThe navy blazer and charcoal trousers create a sharp, professional silhouette that fits the formal bank environment perfectly.",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 1893,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls get_dress_code",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions blazer",
+          "pass": true
+        },
+        {
+          "name": "mentions trousers",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "The reply is perfect, following all instructions and providing a highly appropriate outfit for the occasion."
+      }
+    },
+    {
+      "id": "office",
+      "transcript": {
+        "answer": "White cotton shirt, Charcoal wool trousers, and Brown leather brogues.\n\nThe charcoal wool trousers provide a sharp, professional base that pairs perfectly with the crisp white shirt for a classic smart-casual office look.",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 2327,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "N/A"
+      }
+    },
+    {
+      "id": "first-date",
+      "transcript": {
+        "answer": "Navy merino crew-neck jumper, Beige chinos, and Brown leather brogues.\n\nThe jumper and chinos create a polished but approachable look that fits a wine bar perfectly for an autumn evening.",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 3558,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "N/A"
+      }
+    },
+    {
+      "id": "funeral",
+      "transcript": {
+        "answer": "I'm sorry, but I can't find a suitable outfit for a funeral in your wardrobe. You're missing a dark suit or a formal dress, which would be the best way to meet the formal dress code.",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 2118,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls get_dress_code",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions charcoal|navy",
+          "pass": false
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": false,
+        "tone": 2,
+        "wearability": null,
+        "reason": "The stylist failed to provide a suitable outfit from the owned items as instructed in the prompt."
+      }
+    },
+    {
+      "id": "country-walk",
+      "transcript": {
+        "answer": "Grey marl t-shirt, Dark indigo straight jeans, Olive waxed jacket, and White leather trainers.\n\nThe waxed jacket is a classic autumn staple that's perfect for keeping you dry and warm while walking, and the jeans keep the look practical but put-together.",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 3832,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions waxed jacket|overcoat",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "null"
+      }
+    },
+    {
+      "id": "style-chinos",
+      "transcript": {
+        "answer": "You could wear the White cotton shirt and the Navy merino crew-neck jumper with your Beige chinos.\n\nThe navy and white palette creates a classic, clean contrast that's perfect for a smart-casual autumn look.",
+        "tools": [
+          "get_today",
+          "search_wardrobe",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 3624,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions shirt|jumper",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "The reply suggests a perfectly coherent outfit using only owned items with a brief, stylish explanation."
+      }
+    },
+    {
+      "id": "rain",
+      "transcript": {
+        "answer": "I've checked your wardrobe and you don't have any specific rain gear like a waterproof coat or boots. You'd need a trench coat or a pair of waterproof Chelsea boots to stay dry.",
+        "tools": [
+          "get_today",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 2185,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions waxed jacket",
+          "pass": false
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": false,
+        "tone": 3,
+        "wearability": null,
+        "reason": "The reply failed to identify the olive waxed jacket as a weather-resistant option as instructed."
+      }
+    },
+    {
+      "id": "trainers-at-wedding",
+      "transcript": {
+        "answer": "No, the dress code for a wedding guest is formal and specifically rules out trainers. You'd be better off with your Brown leather brogues.\n\nWhite cotton shirt, Charcoal wool trousers, Navy wool blazer, and Brown leather brogues.\n\nThe blazer and wool trousers provide the necessary formality for a wedding, while the brogues keep the look polished without breaking the rules.",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 3974,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls get_dress_code",
+          "pass": true
+        },
+        {
+          "name": "mentions brogues|chelsea",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "null"
+      }
+    },
+    {
+      "id": "list-shoes",
+      "transcript": {
+        "answer": "You've got white leather trainers, brown leather brogues, and black Chelsea boots.",
+        "tools": [
+          "search_wardrobe"
+        ]
+      },
+      "ms": 728,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions trainers",
+          "pass": true
+        },
+        {
+          "name": "mentions brogues",
+          "pass": true
+        },
+        {
+          "name": "mentions chelsea",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": null,
+        "reason": "N/A"
+      }
+    },
+    {
+      "id": "garden-party",
+      "transcript": {
+        "answer": "I'm afraid you don't have a summer-appropriate dress or a light suit in your wardrobe for a garden party. Since it's currently autumn, I'd suggest the Striped linen shirt and Beige chinos with the White leather trainers for a relaxed, smart-casual look.",
+        "tools": [
+          "get_today",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 3966,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions linen",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "N/A"
+      }
+    },
+    {
+      "id": "black-tie",
+      "transcript": {
+        "answer": "",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "get_dress_code",
+          "get_dress_code",
+          "get_dress_code",
+          "get_dress_code"
+        ]
+      },
+      "ms": 4079,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": false
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "mentions (don't|do not|doesn't) (own|have)|missing|no (dinner suit|tuxedo)",
+          "pass": false
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": false,
+        "tone": 1,
+        "wearability": null,
+        "reason": "The AI failed to provide any response."
+      }
+    },
+    {
+      "id": "beach",
+      "transcript": {
+        "answer": "",
+        "tools": [
+          "get_today",
+          "search_wardrobe",
+          "search_wardrobe",
+          "search_wardrobe",
+          "search_wardrobe",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 5161,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": false
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions swim|shorts|sandal",
+          "pass": false
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 1,
+        "wearability": null,
+        "reason": "The AI provided no response."
+      }
+    },
+    {
+      "id": "today",
+      "transcript": {
+        "answer": "What's the occasion for today?",
+        "tools": [
+          "get_today"
+        ]
+      },
+      "ms": 1488,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls get_today",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 3,
+        "wearability": null,
+        "reason": "The tone is a bit dry and lacks the warmth of a fashion-savvy friend."
+      }
+    },
+    {
+      "id": "vague",
+      "transcript": {
+        "answer": "What's the occasion for your outing?",
+        "tools": []
+      },
+      "ms": 649,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "asks a question",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 4,
+        "wearability": null,
+        "reason": "The response is direct and follows instructions but lacks the warmth of a fashion-forward friend."
+      }
+    },
+    {
+      "id": "blazer-and-jeans",
+      "transcript": {
+        "answer": "Navy wool blazer, Dark indigo straight jeans, and Navy merino crew-neck jumper.\n\nThe navy wool blazer elevates the jeans for a smart-casual look, while the jumper keeps it comfortable for an autumn day.",
+        "tools": [
+          "get_today",
+          "search_wardrobe",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 3435,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions shirt|jumper",
+          "pass": true
+        },
+        {
+          "name": "avoids (don't|do not) (own|have) a (white )?shirt",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 4,
+        "wearability": 5,
+        "reason": "The reply omitted a pair of shoes, which was a requirement for a good reply in this context."
+      }
+    },
+    {
+      "id": "tie-at-office",
+      "transcript": {
+        "answer": "I'd suggest pairing your Burgundy knitted tie with the Navy blazer and the White button-down shirt.\n\nThe knitted texture of the tie keeps the look smart but relaxed, which fits the office's smart-casual vibe perfectly for an autumn day.",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 2825,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "mentions shirt",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "null"
+      }
+    },
+    {
+      "id": "red-dress",
+      "transcript": {
+        "answer": "You don't own a red dress. A silk slip dress in a deep crimson would be a great addition to your collection.",
+        "tools": [
+          "search_wardrobe",
+          "search_wardrobe",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 4666,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions (don't|do not|doesn't) (own|have)",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": false,
+        "tone": 4,
+        "wearability": null,
+        "reason": "The reply suggests buying a new item, which violates the instruction to not push buying."
+      }
+    },
+    {
+      "id": "winter-pieces",
+      "transcript": {
+        "answer": "You've got some solid pieces for the colder months. Here's a smart-casual look for a winter day:\n\nNavy merino crew-neck jumper, Charcoal wool trousers, Camel wool overcoat, and Black Chelsea boots.\n\nThe heavy textures of the wool and knitwear provide warmth while the camel and navy tones keep the look sophisticated.",
+        "tools": [
+          "get_today",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 2208,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions overcoat",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "N/A"
+      }
+    },
+    {
+      "id": "hurtful-remark",
+      "transcript": {
+        "answer": "I'm sorry that comment stung, but it's always about how the clothes sit on you, not your body. Since you're looking for an alternative to the Navy merino crew-neck jumper, I'd suggest the White cotton shirt.\n\nWhite cotton shirt\nIt's a classic choice that offers a cleaner silhouette and a more structured look for the autumn weather.",
+        "tools": [
+          "get_today",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 2929,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "avoids slimming|flatter(s|ing)? your (figure|shape)|hide",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 4,
+        "reason": "The reply suggests a single item rather than a complete outfit."
+      }
+    },
+    {
+      "id": "feedback-too-stiff",
+      "transcript": {
+        "answer": "White cotton shirt, Navy merino crew-neck jumper, Charcoal wool trousers and Brown leather brogues.\n\nSwapping the blazer for a jumper keeps it smart but feels much more relaxed for a Friday.",
+        "tools": [
+          "get_today",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 4541,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "mentions jumper|waxed jacket",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "The reply perfectly follows the instructions by replacing the blazer with a softer owned layer while maintaining a smart-casual aesthetic."
+      }
+    },
+    {
+      "id": "clarified-occasion",
+      "transcript": {
+        "answer": "Navy merino crew-neck jumper, Dark indigo straight jeans, and Black Chelsea boots.\n\nThe jumper and jeans create a classic, effortless look that's perfect for a casual night out in the autumn chill.",
+        "tools": [
+          "get_today",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 2386,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions jeans",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "N/A"
+      }
+    },
+    {
+      "id": "preferences",
+      "transcript": {
+        "answer": "What's the occasion you're dressing for?",
+        "tools": []
+      },
+      "ms": 2222,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": false,
+        "tone": 2,
+        "wearability": null,
+        "reason": "The reply fails to acknowledge the user's size and neckline preference as required by the instructions."
+      }
+    },
+    {
+      "id": "trend-wide-leg",
+      "transcript": {
+        "answer": "They're still very much in. They've moved from a bit of a trend to a proper staple in most wardrobes over the last few years. It's really about the drape and the fabric now—a well-tailored pair works for almost anything.",
+        "tools": []
+      },
+      "ms": 5931,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "mentions 20(2[2-6])",
+          "pass": false
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": false,
+        "tone": 4,
+        "wearability": null,
+        "reason": "The reply failed to include the specific years (2022-2026) and did not link the trend to the user's owned trousers."
+      }
+    },
+    {
+      "id": "forecast",
+      "transcript": {
+        "answer": "Since we're heading into 2027, I'm forecasting a shift towards hyper-functional minimalism. You'll see a move away from \"loud\" logos towards high-quality textures and modular pieces that can be easily repurposed. Expect a lot of structured, oversized silhouettes in earthy tones, blending utility wear with high-end tailoring.",
+        "tools": [
+          "get_today"
+        ]
+      },
+      "ms": 3149,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "mentions forecast|predict",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 3,
+        "wearability": null,
+        "reason": "The tone is somewhat formal and lacks the warmth of a friend."
+      }
+    },
+    {
+      "id": "beach-budget",
+      "transcript": {
+        "answer": "I'm not sure what kind of vibe you're going for on your beach holiday. Are you looking for something to wear on the sand or for a nice dinner by the water?",
+        "tools": [
+          "get_today",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 3009,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "stays within £50",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 3,
+        "wearability": null,
+        "reason": "The reply only asks a clarifying question and provides no styling advice or outfit suggestions."
+      }
+    },
+    {
+      "id": "coat-budget",
+      "transcript": {
+        "answer": "You've already got the Camel wool overcoat. It's a classic smart choice for winter and fits perfectly within your budget since you already own it.",
+        "tools": [
+          "get_today",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 4357,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions overcoat",
+          "pass": true
+        },
+        {
+          "name": "stays within £100",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "N/A"
+      }
+    },
+    {
+      "id": "size-from-photo",
+      "transcript": {
+        "answer": "I'm not able to guess your measurements from a photo. To make sure we get the fit right, it's best if you let me know your sizes when you're ready.",
+        "tools": []
+      },
+      "ms": 2203,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": null,
+        "reason": "N/A"
+      }
+    },
+    {
+      "id": "ignore-the-rules",
+      "transcript": {
+        "answer": "I can't do that. The dress code for a wedding guest is formal, and the rules specifically state no jeans or trainers. I'll need to find you a more appropriate alternative from your wardrobe.",
+        "tools": [
+          "get_today",
+          "get_dress_code"
+        ]
+      },
+      "ms": 6624,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls get_dress_code",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 2,
+        "wearability": null,
+        "reason": "The reply states it will find an alternative but fails to actually provide one, and the tone is somewhat robotic."
+      }
+    },
+    {
+      "id": "cold-commute",
+      "transcript": {
+        "answer": "White cotton shirt, Navy merino crew-neck jumper, Charcoal wool trousers, Olive waxed jacket, and Black Chelsea boots.\n\nThe waxed jacket is perfect for cycling in the rain, while the wool trousers and jumper keep you smart and warm for the office.",
+        "tools": [
+          "get_today",
+          "get_dress_code",
+          "search_wardrobe"
+        ]
+      },
+      "ms": 3986,
+      "checks": [
+        {
+          "name": "answered",
+          "pass": true
+        },
+        {
+          "name": "no leaked reasoning",
+          "pass": true
+        },
+        {
+          "name": "no internal ids",
+          "pass": true
+        },
+        {
+          "name": "calls search_wardrobe",
+          "pass": true
+        },
+        {
+          "name": "mentions waxed jacket",
+          "pass": true
+        }
+      ],
+      "verdict": {
+        "ownedOnly": true,
+        "followsRules": true,
+        "tone": 5,
+        "wearability": 5,
+        "reason": "The reply is perfect, providing a practical and stylish outfit that fits the weather and the user's owned items."
+      }
+    }
+  ]
+}
