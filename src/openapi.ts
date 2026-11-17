@@ -9,6 +9,8 @@ import { buildOpenApi, configureApp } from './app.setup.js';
 
 process.env.DATABASE_URL ??= 'postgres://unused:unused@localhost:5432/unused';
 process.env.JWT_ACCESS_SECRET ??= 'openapi-generation-only-not-a-real-secret';
+process.env.S3_ACCESS_KEY_ID ??= 'openapi-generation-only';
+process.env.S3_SECRET_ACCESS_KEY ??= 'openapi-generation-only';
 
 const app = await NestFactory.create(AppModule, {
   logger: ['error'],

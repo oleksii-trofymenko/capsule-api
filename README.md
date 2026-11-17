@@ -14,7 +14,7 @@ Requirements: Node 22.12+, Docker Desktop, [Ollama](https://ollama.com) for loca
 
 ```bash
 npm install
-npm run setup                 # creates .env with a generated secret, starts Postgres + SeaweedFS, migrates
+npm run setup                 # creates .env with a generated secret, starts Postgres + SeaweedFS, migrates, creates the photo bucket
 ollama pull gemma4:12b && ollama pull nomic-embed-text
 npm run start:dev
 ```
