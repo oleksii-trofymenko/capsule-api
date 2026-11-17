@@ -57,6 +57,8 @@ describe('OccasionsService.find', () => {
 
   it.each([
     ['a casual date', 'first-date'],
+    ['My cousin is getting married on Saturday.', 'wedding-guest'],
+    ["I'm married; what should I wear to the office?", 'office'],
     ['Funeral, next week', 'funeral'],
     ['Christmas holiday party', undefined],
     ['What should I wear to work out at the gym?', undefined],
