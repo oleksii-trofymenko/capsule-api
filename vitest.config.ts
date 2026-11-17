@@ -27,6 +27,8 @@ export default defineConfig({
           ...shared,
           name: 'integration',
           include: ['test/integration/**/*.int-spec.ts'],
+          // Each test builds a fresh database and applies every migration: about 5 s on a CI runner.
+          testTimeout: 20_000,
         },
       },
       {

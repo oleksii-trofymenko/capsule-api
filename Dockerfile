@@ -12,6 +12,7 @@ WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/drizzle ./drizzle
+COPY --from=build /app/data ./data
 COPY package.json ./
 # Run as the unprivileged user that ships with the image.
 USER node

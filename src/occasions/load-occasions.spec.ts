@@ -1,0 +1,90 @@
+import { buildLibrary } from './load-occasions.js';
+
+const structure = {
+  occasions: [
+    {
+      id: 'wedding-guest',
+      formality: 'formal',
+      rules: [{ id: 'formal', type: 'minFormality', level: 'formal' }],
+    },
+    { id: 'weekend', formality: 'casual', rules: [] },
+  ],
+};
+const text = {
+  'wedding-guest': {
+    name: 'Wedding guest',
+    aliases: ['wedding'],
+    guidance: 'Tailored.',
+    rules: { formal: 'Wear formal pieces.' },
+  },
+  weekend: { name: 'Weekend', aliases: [], guidance: 'Comfy.', rules: {} },
+};
+
+describe('buildLibrary', () => {
+  it('joins structure and text', () => {
+    const [wedding] = buildLibrary(structure, { en: text });
+    expect(wedding).toMatchObject({
+      id: 'wedding-guest',
+      text: {
+        en: { name: 'Wedding guest', rules: { formal: 'Wear formal pieces.' } },
+      },
+    });
+  });
+
+  it.each([
+    [
+      'an unknown rule type',
+      {
+        occasions: [
+          { id: 'x', formality: 'smart', rules: [{ id: 'r', type: 'vibes' }] },
+        ],
+      },
+      text,
+      /occasions\.json is invalid/,
+    ],
+    [
+      'an occasion with no text',
+      structure,
+      { 'wedding-guest': text['wedding-guest'] },
+      /en: no text for "weekend"/,
+    ],
+    [
+      'a rule with no message',
+      structure,
+      { ...text, 'wedding-guest': { ...text['wedding-guest'], rules: {} } },
+      /no message for rule "wedding-guest\/formal"/,
+    ],
+    [
+      'a message for a rule that does not exist',
+      structure,
+      { ...text, weekend: { ...text.weekend, rules: { comfy: 'Be comfy.' } } },
+      /message for unknown rule "weekend\/comfy"/,
+    ],
+    [
+      'text for an occasion that does not exist',
+      structure,
+      { ...text, gala: text.weekend },
+      /text for unknown occasion "gala"/,
+    ],
+    [
+      'an alias that names two occasions',
+      structure,
+      { ...text, weekend: { ...text.weekend, aliases: ['Wedding'] } },
+      /"wedding" names both "wedding-guest" and "weekend"/,
+    ],
+    [
+      'the same occasion twice',
+      { occasions: [...structure.occasions, structure.occasions[1]] },
+      text,
+      /occasion "weekend" is defined twice/,
+    ],
+    [
+      'a locale file field that is empty, naming the field',
+      structure,
+      { ...text, weekend: { ...text.weekend, guidance: '' } },
+      /en\.json is invalid:\n\s+weekend\.guidance: /,
+    ],
+  ])('refuses %s', (_name, s, t, error) => {
+    expect(() => buildLibrary(s, { en: t })).toThrow(error);
+  });
+});
