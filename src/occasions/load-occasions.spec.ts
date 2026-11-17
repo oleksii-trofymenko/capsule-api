@@ -78,6 +78,12 @@ describe('buildLibrary', () => {
       text,
       /occasion "weekend" is defined twice/,
     ],
+    [
+      'a locale file field that is empty, naming the field',
+      structure,
+      { ...text, weekend: { ...text.weekend, guidance: '' } },
+      /en\.json is invalid:\n\s+weekend\.guidance: /,
+    ],
   ])('refuses %s', (_name, s, t, error) => {
     expect(() => buildLibrary(s, { en: t })).toThrow(error);
   });

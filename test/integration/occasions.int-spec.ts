@@ -32,6 +32,13 @@ const tie = item('Burgundy knitted tie', 'accessory', 'burgundy', 'smart');
 const trainers = item('White leather trainers', 'shoes', 'white', 'casual');
 const overcoat = item('Camel wool overcoat', 'outerwear', 'camel', 'smart');
 
+/** The rule breaks for a known occasion. */
+function breaksFor(id: string, items: OutfitItem[], locale: 'en') {
+  const result = occasions.check(id, items, locale);
+  if (!result.found) throw new Error(`no occasion ${id}`);
+  return result.breaks;
+}
+
 describe('OccasionsService.find', () => {
   it.each([
     ['Wedding guest', 'wedding-guest'],
@@ -62,33 +69,25 @@ describe('OccasionsService.find', () => {
 describe('OccasionsService.check', () => {
   it('passes a classic wedding outfit, white shirt under a navy blazer included', () => {
     expect(
-      occasions.check(
-        'wedding-guest',
-        [blazer, shirt, trousers, brogues],
-        'en',
-      ),
+      breaksFor('wedding-guest', [blazer, shirt, trousers, brogues], 'en'),
     ).toEqual([]);
   });
 
   it("passes the stylist's own wedding outfit, as the sample wardrobe tags it", () => {
     expect(
-      occasions.check(
-        'wedding-guest',
-        [blazer, shirt, trousers, brogues, tie],
-        'en',
-      ),
+      breaksFor('wedding-guest', [blazer, shirt, trousers, brogues, tie], 'en'),
     ).toEqual([]);
   });
 
   it('asks black tie for formal tailoring, not a formal shirt and shoes', () => {
     expect(
-      occasions.check('black-tie', [blazer, shirt, trousers, brogues], 'en'),
+      breaksFor('black-tie', [blazer, shirt, trousers, brogues], 'en'),
     ).toEqual([]);
     const chinos = item('Navy chinos', 'bottom', 'navy', 'smart');
     expect(
-      occasions
-        .check('black-tie', [blazer, shirt, chinos, brogues], 'en')
-        .map((b) => [b.ruleId, b.items]),
+      breaksFor('black-tie', [blazer, shirt, chinos, brogues], 'en').map(
+        (b) => [b.ruleId, b.items],
+      ),
     ).toEqual([
       ['formal', ['Navy chinos']],
       ['no-casual-pieces', ['Navy chinos']],
@@ -97,11 +96,7 @@ describe('OccasionsService.check', () => {
 
   it('explains why trainers do not work at a wedding', () => {
     expect(
-      occasions.check(
-        'wedding-guest',
-        [blazer, shirt, trousers, trainers],
-        'en',
-      ),
+      breaksFor('wedding-guest', [blazer, shirt, trousers, trainers], 'en'),
     ).toEqual([
       {
         ruleId: 'smart',
@@ -118,31 +113,31 @@ describe('OccasionsService.check', () => {
 
   it('keeps a funeral dark, but allows a white shirt', () => {
     expect(
-      occasions.check('funeral', [blazer, shirt, trousers, brogues], 'en'),
+      breaksFor('funeral', [blazer, shirt, trousers, brogues], 'en'),
     ).toEqual([]);
     expect(
-      occasions
-        .check('funeral', [overcoat, shirt, trousers, brogues], 'en')
-        .map((b) => b.ruleId),
+      breaksFor('funeral', [overcoat, shirt, trousers, brogues], 'en').map(
+        (b) => b.ruleId,
+      ),
     ).toEqual(['dark-colours']);
   });
 
   it('rules out boots for the beach, as its message says', () => {
     const boots = item('Black ankle boots', 'shoes', 'black', 'casual');
     expect(
-      occasions.check('beach-holiday', [boots], 'en').map((b) => b.ruleId),
+      breaksFor('beach-holiday', [boots], 'en').map((b) => b.ruleId),
     ).toEqual(['no-heavy-pieces']);
   });
 
   it('rules out a wool overcoat for the beach', () => {
     expect(
-      occasions.check('beach-holiday', [overcoat], 'en').map((b) => b.ruleId),
+      breaksFor('beach-holiday', [overcoat], 'en').map((b) => b.ruleId),
     ).toEqual(['no-heavy-pieces']);
   });
 
   it('refuses an occasion id it does not know', () => {
-    expect(() => occasions.check('moon-landing', [], 'en')).toThrow(
-      'Unknown occasion "moon-landing"',
-    );
+    expect(occasions.check('moon-landing', [], 'en')).toEqual({
+      found: false,
+    });
   });
 });

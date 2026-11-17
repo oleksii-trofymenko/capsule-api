@@ -62,12 +62,21 @@ describe('OccasionsService.find', () => {
 
 describe('OccasionsService.check', () => {
   it('returns each broken rule with its message in the locale', () => {
-    expect(occasions.check('wedding-guest', [trainers], 'en')).toEqual([
-      {
-        ruleId: 'no-trainers',
-        items: ['White leather trainers'],
-        message: 'No trainers.',
-      },
-    ]);
+    expect(occasions.check('wedding-guest', [trainers], 'en')).toEqual({
+      found: true,
+      breaks: [
+        {
+          ruleId: 'no-trainers',
+          items: ['White leather trainers'],
+          message: 'No trainers.',
+        },
+      ],
+    });
+  });
+
+  it('reports an unknown occasion id instead of throwing: ids may come from a model', () => {
+    expect(occasions.check('wedding', [trainers], 'en')).toEqual({
+      found: false,
+    });
   });
 });

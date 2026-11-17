@@ -51,7 +51,10 @@ export function buildLibrary(
   for (const locale of LOCALES) {
     const result = occasionTextFileSchema.safeParse(texts[locale]);
     if (!result.success) {
-      problems.push(`${locale}.json is invalid`);
+      const issues = result.error.issues.map(
+        (i) => `    ${i.path.join('.')}: ${i.message}`,
+      );
+      problems.push(`${locale}.json is invalid:\n${issues.join('\n')}`);
       continue;
     }
     localeTexts[locale] = result.data;

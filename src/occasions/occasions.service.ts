@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import type { Locale } from '../locale.js';
+import { LOCALES, type Locale } from '../locale.js';
 import { checkOutfit, type OutfitItem } from './check-outfit.js';
 import { OCCASION_LIBRARY, type Occasion } from './load-occasions.js';
 import { normalise } from './normalise.js';
@@ -14,13 +14,37 @@ export interface RuleBreak {
  * The occasion library, loaded and validated once at start-up: a broken data
  * file stops the app instead of failing a user's request later.
  */
+export type CheckResult =
+  { found: false } | { found: true; breaks: RuleBreak[] };
+
+interface Name {
+  name: string;
+  occasion: Occasion;
+}
+
 @Injectable()
 export class OccasionsService {
+  /** Every name and alias per locale, normalised once, longest first. */
+  private readonly names: Record<Locale, Name[]>;
+
   constructor(
     @Inject(OCCASION_LIBRARY) private readonly occasions: Occasion[],
   ) {
+    const namesFor = (locale: Locale): Name[] =>
+      occasions
+        .flatMap((occasion) =>
+          [
+            occasion.id,
+            occasion.text[locale].name,
+            ...occasion.text[locale].aliases,
+          ].map((n) => ({ name: normalise(n), occasion })),
+        )
+        .sort((a, b) => b.name.length - a.name.length);
+    this.names = Object.fromEntries(
+      LOCALES.map((l) => [l, namesFor(l)]),
+    ) as Record<Locale, Name[]>;
     new Logger(OccasionsService.name).log(
-      `Loaded ${this.occasions.length} occasions`,
+      `Loaded ${occasions.length} occasions`,
     );
   }
 
@@ -32,32 +56,24 @@ export class OccasionsService {
     return this.occasions.find((o) => o.id === id);
   }
 
-  /**
-   * The occasion a phrase refers to: an exact name or alias, else the longest
-   * name or alias that appears in it ("my sister's wedding" is a wedding).
-   */
+  /** The occasion whose longest name or alias appears in the phrase ("my sister's wedding?" is a wedding). */
   find(text: string, locale: Locale): Occasion | undefined {
-    const phrase = normalise(text);
-    const names = this.occasions.flatMap((o) =>
-      [o.id, o.text[locale].name, ...o.text[locale].aliases].map((n) => ({
-        name: normalise(n),
-        occasion: o,
-      })),
-    );
-    const exact = names.find((n) => n.name === phrase);
-    if (exact) return exact.occasion;
-    return names
-      .filter((n) => ` ${phrase} `.includes(` ${n.name} `))
-      .sort((a, b) => b.name.length - a.name.length)[0]?.occasion;
+    const phrase = ` ${normalise(text)} `;
+    return this.names[locale].find((n) => phrase.includes(` ${n.name} `))
+      ?.occasion;
   }
 
-  /** The occasion's rules this outfit breaks, explained in the given locale. */
-  check(occasionId: string, items: OutfitItem[], locale: Locale): RuleBreak[] {
+  /**
+   * The occasion's rules this outfit breaks, explained in the given locale.
+   * The id may come from a model, so an unknown one is a result, not an error.
+   */
+  check(occasionId: string, items: OutfitItem[], locale: Locale): CheckResult {
     const occasion = this.get(occasionId);
-    if (!occasion) throw new Error(`Unknown occasion "${occasionId}"`);
-    return checkOutfit(occasion.rules, items).map((v) => ({
+    if (!occasion) return { found: false };
+    const breaks = checkOutfit(occasion.rules, items).map((v) => ({
       ...v,
       message: occasion.text[locale].rules[v.ruleId],
     }));
+    return { found: true, breaks };
   }
 }
