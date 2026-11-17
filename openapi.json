@@ -1816,6 +1816,871 @@
           "wardrobe"
         ]
       }
+    },
+    "/v1/profile/quiz": {
+      "get": {
+        "operationId": "ProfileController_quiz_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "title": {
+                      "type": "string"
+                    },
+                    "intro": {
+                      "type": "string"
+                    },
+                    "questions": {
+                      "type": "array",
+                      "items": {
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "enum": [
+                                  "sizes"
+                                ]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "sizes"
+                                ]
+                              },
+                              "question": {
+                                "type": "string"
+                              },
+                              "hint": {
+                                "type": "string"
+                              },
+                              "parts": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "label": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "label"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "systems": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "label": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "label"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "question",
+                              "hint",
+                              "parts",
+                              "systems"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "enum": [
+                                  "fit",
+                                  "lifestyle"
+                                ]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "single"
+                                ]
+                              },
+                              "question": {
+                                "type": "string"
+                              },
+                              "options": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "label": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "label"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "question",
+                              "options"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "enum": [
+                                  "directions",
+                                  "favouriteColours",
+                                  "avoidColours",
+                                  "neverWear"
+                                ]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "multi"
+                                ]
+                              },
+                              "question": {
+                                "type": "string"
+                              },
+                              "hint": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "max": {
+                                "type": "integer",
+                                "minimum": -9007199254740991,
+                                "maximum": 9007199254740991
+                              },
+                              "options": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "label": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "label"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "question",
+                              "hint",
+                              "max",
+                              "options"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "title",
+                    "intro",
+                    "questions"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "profile"
+        ]
+      }
+    },
+    "/v1/profile": {
+      "get": {
+        "operationId": "ProfileController_get_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profile": {
+                      "nullable": true,
+                      "description": "Null until the quiz is answered",
+                      "type": "object",
+                      "properties": {
+                        "sizes": {
+                          "type": "object",
+                          "properties": {
+                            "top": {
+                              "nullable": true,
+                              "type": "object",
+                              "properties": {
+                                "system": {
+                                  "type": "string",
+                                  "enum": [
+                                    "UK",
+                                    "EU",
+                                    "US",
+                                    "INT"
+                                  ]
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 10
+                                }
+                              },
+                              "required": [
+                                "system",
+                                "value"
+                              ],
+                              "additionalProperties": false,
+                              "description": "A size is stored with its system: UK 12, EU 40, INT M"
+                            },
+                            "bottom": {
+                              "nullable": true,
+                              "type": "object",
+                              "properties": {
+                                "system": {
+                                  "type": "string",
+                                  "enum": [
+                                    "UK",
+                                    "EU",
+                                    "US",
+                                    "INT"
+                                  ]
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 10
+                                }
+                              },
+                              "required": [
+                                "system",
+                                "value"
+                              ],
+                              "additionalProperties": false,
+                              "description": "A size is stored with its system: UK 12, EU 40, INT M"
+                            },
+                            "shoes": {
+                              "nullable": true,
+                              "type": "object",
+                              "properties": {
+                                "system": {
+                                  "type": "string",
+                                  "enum": [
+                                    "UK",
+                                    "EU",
+                                    "US",
+                                    "INT"
+                                  ]
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 10
+                                }
+                              },
+                              "required": [
+                                "system",
+                                "value"
+                              ],
+                              "additionalProperties": false,
+                              "description": "A size is stored with its system: UK 12, EU 40, INT M"
+                            }
+                          },
+                          "required": [
+                            "top",
+                            "bottom",
+                            "shoes"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "fit": {
+                          "type": "string",
+                          "enum": [
+                            "fitted",
+                            "regular",
+                            "relaxed"
+                          ]
+                        },
+                        "directions": {
+                          "minItems": 1,
+                          "maxItems": 3,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "classic",
+                              "minimal",
+                              "smart-casual",
+                              "streetwear",
+                              "romantic",
+                              "bohemian",
+                              "edgy",
+                              "sporty",
+                              "preppy"
+                            ]
+                          }
+                        },
+                        "favouriteColours": {
+                          "maxItems": 6,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "neutrals",
+                              "earth-tones",
+                              "blues",
+                              "pastels",
+                              "brights",
+                              "jewel-tones"
+                            ]
+                          }
+                        },
+                        "avoidColours": {
+                          "maxItems": 6,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "neutrals",
+                              "earth-tones",
+                              "blues",
+                              "pastels",
+                              "brights",
+                              "jewel-tones"
+                            ]
+                          }
+                        },
+                        "lifestyle": {
+                          "type": "string",
+                          "enum": [
+                            "office",
+                            "smart-casual-work",
+                            "casual",
+                            "active",
+                            "mixed"
+                          ]
+                        },
+                        "neverWear": {
+                          "maxItems": 7,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "high-necklines",
+                              "sleeveless",
+                              "short-hemlines",
+                              "skinny-fits",
+                              "heels",
+                              "logos",
+                              "bold-patterns"
+                            ]
+                          }
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        }
+                      },
+                      "required": [
+                        "sizes",
+                        "fit",
+                        "directions",
+                        "favouriteColours",
+                        "avoidColours",
+                        "lifestyle",
+                        "neverWear",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "profile"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "profile"
+        ]
+      },
+      "put": {
+        "operationId": "ProfileController_save_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sizes": {
+                    "type": "object",
+                    "properties": {
+                      "top": {
+                        "nullable": true,
+                        "type": "object",
+                        "properties": {
+                          "system": {
+                            "type": "string",
+                            "enum": [
+                              "UK",
+                              "EU",
+                              "US",
+                              "INT"
+                            ]
+                          },
+                          "value": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 10
+                          }
+                        },
+                        "required": [
+                          "system",
+                          "value"
+                        ],
+                        "description": "A size is stored with its system: UK 12, EU 40, INT M"
+                      },
+                      "bottom": {
+                        "nullable": true,
+                        "type": "object",
+                        "properties": {
+                          "system": {
+                            "type": "string",
+                            "enum": [
+                              "UK",
+                              "EU",
+                              "US",
+                              "INT"
+                            ]
+                          },
+                          "value": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 10
+                          }
+                        },
+                        "required": [
+                          "system",
+                          "value"
+                        ],
+                        "description": "A size is stored with its system: UK 12, EU 40, INT M"
+                      },
+                      "shoes": {
+                        "nullable": true,
+                        "type": "object",
+                        "properties": {
+                          "system": {
+                            "type": "string",
+                            "enum": [
+                              "UK",
+                              "EU",
+                              "US",
+                              "INT"
+                            ]
+                          },
+                          "value": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 10
+                          }
+                        },
+                        "required": [
+                          "system",
+                          "value"
+                        ],
+                        "description": "A size is stored with its system: UK 12, EU 40, INT M"
+                      }
+                    },
+                    "required": [
+                      "top",
+                      "bottom",
+                      "shoes"
+                    ]
+                  },
+                  "fit": {
+                    "type": "string",
+                    "enum": [
+                      "fitted",
+                      "regular",
+                      "relaxed"
+                    ]
+                  },
+                  "directions": {
+                    "minItems": 1,
+                    "maxItems": 3,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "classic",
+                        "minimal",
+                        "smart-casual",
+                        "streetwear",
+                        "romantic",
+                        "bohemian",
+                        "edgy",
+                        "sporty",
+                        "preppy"
+                      ]
+                    }
+                  },
+                  "favouriteColours": {
+                    "maxItems": 6,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "neutrals",
+                        "earth-tones",
+                        "blues",
+                        "pastels",
+                        "brights",
+                        "jewel-tones"
+                      ]
+                    }
+                  },
+                  "avoidColours": {
+                    "maxItems": 6,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "neutrals",
+                        "earth-tones",
+                        "blues",
+                        "pastels",
+                        "brights",
+                        "jewel-tones"
+                      ]
+                    }
+                  },
+                  "lifestyle": {
+                    "type": "string",
+                    "enum": [
+                      "office",
+                      "smart-casual-work",
+                      "casual",
+                      "active",
+                      "mixed"
+                    ]
+                  },
+                  "neverWear": {
+                    "maxItems": 7,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "high-necklines",
+                        "sleeveless",
+                        "short-hemlines",
+                        "skinny-fits",
+                        "heels",
+                        "logos",
+                        "bold-patterns"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "sizes",
+                  "fit",
+                  "directions",
+                  "favouriteColours",
+                  "avoidColours",
+                  "lifestyle",
+                  "neverWear"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profile": {
+                      "nullable": true,
+                      "description": "Null until the quiz is answered",
+                      "type": "object",
+                      "properties": {
+                        "sizes": {
+                          "type": "object",
+                          "properties": {
+                            "top": {
+                              "nullable": true,
+                              "type": "object",
+                              "properties": {
+                                "system": {
+                                  "type": "string",
+                                  "enum": [
+                                    "UK",
+                                    "EU",
+                                    "US",
+                                    "INT"
+                                  ]
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 10
+                                }
+                              },
+                              "required": [
+                                "system",
+                                "value"
+                              ],
+                              "additionalProperties": false,
+                              "description": "A size is stored with its system: UK 12, EU 40, INT M"
+                            },
+                            "bottom": {
+                              "nullable": true,
+                              "type": "object",
+                              "properties": {
+                                "system": {
+                                  "type": "string",
+                                  "enum": [
+                                    "UK",
+                                    "EU",
+                                    "US",
+                                    "INT"
+                                  ]
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 10
+                                }
+                              },
+                              "required": [
+                                "system",
+                                "value"
+                              ],
+                              "additionalProperties": false,
+                              "description": "A size is stored with its system: UK 12, EU 40, INT M"
+                            },
+                            "shoes": {
+                              "nullable": true,
+                              "type": "object",
+                              "properties": {
+                                "system": {
+                                  "type": "string",
+                                  "enum": [
+                                    "UK",
+                                    "EU",
+                                    "US",
+                                    "INT"
+                                  ]
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "maxLength": 10
+                                }
+                              },
+                              "required": [
+                                "system",
+                                "value"
+                              ],
+                              "additionalProperties": false,
+                              "description": "A size is stored with its system: UK 12, EU 40, INT M"
+                            }
+                          },
+                          "required": [
+                            "top",
+                            "bottom",
+                            "shoes"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "fit": {
+                          "type": "string",
+                          "enum": [
+                            "fitted",
+                            "regular",
+                            "relaxed"
+                          ]
+                        },
+                        "directions": {
+                          "minItems": 1,
+                          "maxItems": 3,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "classic",
+                              "minimal",
+                              "smart-casual",
+                              "streetwear",
+                              "romantic",
+                              "bohemian",
+                              "edgy",
+                              "sporty",
+                              "preppy"
+                            ]
+                          }
+                        },
+                        "favouriteColours": {
+                          "maxItems": 6,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "neutrals",
+                              "earth-tones",
+                              "blues",
+                              "pastels",
+                              "brights",
+                              "jewel-tones"
+                            ]
+                          }
+                        },
+                        "avoidColours": {
+                          "maxItems": 6,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "neutrals",
+                              "earth-tones",
+                              "blues",
+                              "pastels",
+                              "brights",
+                              "jewel-tones"
+                            ]
+                          }
+                        },
+                        "lifestyle": {
+                          "type": "string",
+                          "enum": [
+                            "office",
+                            "smart-casual-work",
+                            "casual",
+                            "active",
+                            "mixed"
+                          ]
+                        },
+                        "neverWear": {
+                          "maxItems": 7,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "high-necklines",
+                              "sleeveless",
+                              "short-hemlines",
+                              "skinny-fits",
+                              "heels",
+                              "logos",
+                              "bold-patterns"
+                            ]
+                          }
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                        }
+                      },
+                      "required": [
+                        "sizes",
+                        "fit",
+                        "directions",
+                        "favouriteColours",
+                        "avoidColours",
+                        "lifestyle",
+                        "neverWear",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "profile"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "profile"
+        ]
+      }
     }
   },
   "info": {

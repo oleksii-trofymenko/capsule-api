@@ -6,7 +6,7 @@ import {
   SIZE_SYSTEMS,
 } from '../db/schema.js';
 
-const size = z
+export const sizeSchema = z
   .object({
     system: z.enum(SIZE_SYSTEMS),
     value: z.string().trim().min(1).max(10),
@@ -23,7 +23,7 @@ const itemFields = {
     .min(1)
     .max(4)
     .refine((s) => new Set(s).size === s.length, 'seasons must not repeat'),
-  size: size.nullable(),
+  size: sizeSchema.nullable(),
   photoId: z
     .uuid()
     .nullable()

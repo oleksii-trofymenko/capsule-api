@@ -29,6 +29,13 @@
       "when": 1794938401253,
       "tag": "0003_photo-tags",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794938840483,
+      "tag": "0004_style-profiles",
+      "breakpoints": true
     }
   ]
 }

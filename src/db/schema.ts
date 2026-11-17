@@ -122,6 +122,80 @@ export const wardrobeItems = pgTable(
   ],
 );
 
+/** Answer codes for the style quiz. Labels live in src/profile/quiz.ts, per locale. */
+export const FITS = ['fitted', 'regular', 'relaxed'] as const;
+export const STYLE_DIRECTIONS = [
+  'classic',
+  'minimal',
+  'smart-casual',
+  'streetwear',
+  'romantic',
+  'bohemian',
+  'edgy',
+  'sporty',
+  'preppy',
+] as const;
+export const COLOUR_FAMILIES = [
+  'neutrals',
+  'earth-tones',
+  'blues',
+  'pastels',
+  'brights',
+  'jewel-tones',
+] as const;
+export const LIFESTYLES = [
+  'office',
+  'smart-casual-work',
+  'casual',
+  'active',
+  'mixed',
+] as const;
+export const NEVER_WEAR = [
+  'high-necklines',
+  'sleeveless',
+  'short-hemlines',
+  'skinny-fits',
+  'heels',
+  'logos',
+  'bold-patterns',
+] as const;
+
+export interface Size {
+  system: (typeof SIZE_SYSTEMS)[number];
+  value: string;
+}
+export interface ProfileSizes {
+  top: Size | null;
+  bottom: Size | null;
+  shoes: Size | null;
+}
+
+export const styleProfiles = pgTable('style_profiles', {
+  /** One profile per user. */
+  userId: uuid('user_id')
+    .primaryKey()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  /** Every size carries its system: UK 12 and EU 40 are not comparable numbers. */
+  sizes: jsonb('sizes').$type<ProfileSizes>().notNull(),
+  fit: text('fit', { enum: FITS }).notNull(),
+  directions: text('directions', { enum: STYLE_DIRECTIONS }).array().notNull(),
+  favouriteColours: text('favourite_colours', { enum: COLOUR_FAMILIES })
+    .array()
+    .notNull(),
+  avoidColours: text('avoid_colours', { enum: COLOUR_FAMILIES })
+    .array()
+    .notNull(),
+  lifestyle: text('lifestyle', { enum: LIFESTYLES }).notNull(),
+  neverWear: text('never_wear', { enum: NEVER_WEAR }).array().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export type User = typeof users.$inferSelect;
 export type PhotoRow = typeof photos.$inferSelect;
 export type WardrobeItemRow = typeof wardrobeItems.$inferSelect;
+export type StyleProfileRow = typeof styleProfiles.$inferSelect;
