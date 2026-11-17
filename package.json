@@ -25,6 +25,7 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "openapi": "nest build && node dist/openapi.js",
+    "eval": "nest build && node dist/eval/main.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
