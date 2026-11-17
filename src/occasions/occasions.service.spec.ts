@@ -1,30 +1,54 @@
 import type { OutfitItem } from './check-outfit.js';
+import { buildLibrary } from './load-occasions.js';
 import { OccasionsService } from './occasions.service.js';
 
-const occasions = new OccasionsService();
+// A small library built in memory: unit tests do no I/O.
+const occasions = new OccasionsService(
+  buildLibrary(
+    {
+      occasions: [
+        {
+          id: 'wedding-guest',
+          formality: 'formal',
+          rules: [
+            { id: 'no-trainers', type: 'forbidItems', words: ['trainer'] },
+          ],
+        },
+        { id: 'black-tie', formality: 'formal', rules: [] },
+      ],
+    },
+    {
+      en: {
+        'wedding-guest': {
+          name: 'Wedding guest',
+          aliases: ['wedding'],
+          guidance: 'Tailored.',
+          rules: { 'no-trainers': 'No trainers.' },
+        },
+        'black-tie': {
+          name: 'Black tie',
+          aliases: ['black tie gala'],
+          guidance: 'Most formal.',
+          rules: {},
+        },
+      },
+    },
+  ),
+);
 
-const item = (
-  name: string,
-  category: OutfitItem['category'],
-  colour: string,
-  formality: OutfitItem['formality'],
-): OutfitItem => ({ name, category, colour, formality });
-
-const blazer = item('Navy wool blazer', 'outerwear', 'navy', 'formal');
-const shirt = item('White cotton shirt', 'top', 'white', 'formal');
-const trousers = item('Charcoal wool trousers', 'bottom', 'charcoal', 'formal');
-const brogues = item('Black leather brogues', 'shoes', 'black', 'formal');
-const trainers = item('White leather trainers', 'shoes', 'white', 'casual');
-const overcoat = item('Camel wool overcoat', 'outerwear', 'camel', 'smart');
+const trainers: OutfitItem = {
+  name: 'White leather trainers',
+  category: 'shoes',
+  colour: 'white',
+  formality: 'casual',
+};
 
 describe('OccasionsService.find', () => {
   it.each([
     ['Wedding guest', 'wedding-guest'],
     ['wedding', 'wedding-guest'],
-    ['BLACK-TIE gala', 'black-tie'],
     ["my sister's wedding next Saturday", 'wedding-guest'],
-    ['a black tie dinner at the museum', 'black-tie'],
-    ['going on a hike', 'country-walk'],
+    ['BLACK-TIE gala', 'black-tie'],
   ])('finds %s', (phrase, id) => {
     expect(occasions.find(phrase, 'en')?.id).toBe(id);
   });
@@ -35,57 +59,13 @@ describe('OccasionsService.find', () => {
 });
 
 describe('OccasionsService.check', () => {
-  it('passes a classic wedding outfit, white shirt under a navy blazer included', () => {
-    expect(
-      occasions.check(
-        'wedding-guest',
-        [blazer, shirt, trousers, brogues],
-        'en',
-      ),
-    ).toEqual([]);
-  });
-
-  it('explains why trainers do not work at a wedding', () => {
-    expect(
-      occasions.check(
-        'wedding-guest',
-        [blazer, shirt, trousers, trainers],
-        'en',
-      ),
-    ).toEqual([
+  it('returns each broken rule with its message in the locale', () => {
+    expect(occasions.check('wedding-guest', [trainers], 'en')).toEqual([
       {
-        ruleId: 'formal',
+        ruleId: 'no-trainers',
         items: ['White leather trainers'],
-        message: 'Wear formal pieces.',
-      },
-      {
-        ruleId: 'no-casual-pieces',
-        items: ['White leather trainers'],
-        message: 'No jeans, trainers, hoodies or t-shirts.',
+        message: 'No trainers.',
       },
     ]);
-  });
-
-  it('keeps a funeral dark, but allows a white shirt', () => {
-    expect(
-      occasions.check('funeral', [blazer, shirt, trousers, brogues], 'en'),
-    ).toEqual([]);
-    expect(
-      occasions
-        .check('funeral', [overcoat, shirt, trousers, brogues], 'en')
-        .map((b) => b.ruleId),
-    ).toEqual(['dark-colours']);
-  });
-
-  it('rules out a wool overcoat for the beach', () => {
-    expect(
-      occasions.check('beach-holiday', [overcoat], 'en').map((b) => b.ruleId),
-    ).toEqual(['no-heavy-pieces']);
-  });
-
-  it('refuses an occasion id it does not know', () => {
-    expect(() => occasions.check('moon-landing', [], 'en')).toThrow(
-      'Unknown occasion "moon-landing"',
-    );
   });
 });

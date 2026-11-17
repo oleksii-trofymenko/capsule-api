@@ -8,6 +8,9 @@ import {
   type Rule,
 } from './occasion.schemas.js';
 
+/** The loaded library. Provided by OccasionsModule from data/occasions; tests pass their own. */
+export const OCCASION_LIBRARY = Symbol('OCCASION_LIBRARY');
+
 export interface Occasion {
   id: string;
   formality: (typeof FORMALITIES)[number];

@@ -1,7 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { Locale } from '../locale.js';
 import { checkOutfit, type OutfitItem } from './check-outfit.js';
-import { normalise, readLibrary, type Occasion } from './load-occasions.js';
+import {
+  normalise,
+  OCCASION_LIBRARY,
+  type Occasion,
+} from './load-occasions.js';
 
 export interface RuleBreak {
   ruleId: string;
@@ -15,10 +19,9 @@ export interface RuleBreak {
  */
 @Injectable()
 export class OccasionsService {
-  private readonly occasions: Occasion[];
-
-  constructor() {
-    this.occasions = readLibrary();
+  constructor(
+    @Inject(OCCASION_LIBRARY) private readonly occasions: Occasion[],
+  ) {
     new Logger(OccasionsService.name).log(
       `Loaded ${this.occasions.length} occasions`,
     );

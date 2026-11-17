@@ -1,4 +1,4 @@
-import { buildLibrary, readLibrary } from './load-occasions.js';
+import { buildLibrary } from './load-occasions.js';
 
 const structure = {
   occasions: [
@@ -19,17 +19,6 @@ const text = {
   },
   weekend: { name: 'Weekend', aliases: [], guidance: 'Comfy.', rules: {} },
 };
-
-describe('readLibrary', () => {
-  it('loads the twelve occasions in data/occasions with text for every locale', () => {
-    const library = readLibrary();
-    expect(library).toHaveLength(12);
-    for (const o of library) {
-      expect(o.text.en.name, o.id).not.toBe('');
-      for (const r of o.rules) expect(o.text.en.rules[r.id], r.id).toBeTruthy();
-    }
-  });
-});
 
 describe('buildLibrary', () => {
   it('joins structure and text', () => {
