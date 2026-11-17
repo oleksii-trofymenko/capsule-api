@@ -6,6 +6,7 @@ import {
   NEVER_WEAR,
   STYLE_DIRECTIONS,
 } from '../db/schema.js';
+import { feedbackSummarySchema } from '../outfits/outfits.schemas.js';
 import { sizeSchema } from '../wardrobe/wardrobe.schemas.js';
 
 const choices = <T extends readonly [string, ...string[]]>(codes: T) =>
@@ -40,6 +41,9 @@ export const profileSchema = z.object({
     .and(z.object({ updatedAt: z.iso.datetime() }))
     .nullable()
     .describe('Null until the quiz is answered'),
+  feedback: feedbackSummarySchema.describe(
+    'Feedback the person gave on suggested outfits',
+  ),
 });
 
 const option = z.object({ id: z.string(), label: z.string() });

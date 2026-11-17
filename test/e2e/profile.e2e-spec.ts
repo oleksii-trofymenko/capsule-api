@@ -4,6 +4,7 @@ import { createTestApp, type TestApp } from '../support/test-app.js';
 describe('Profile API', () => {
   let t: TestApp;
   const http = () => request(t.app.getHttpServer());
+  const noFeedback = { liked: 0, disliked: 0, worn: 0, recent: [] };
   const answers = {
     sizes: {
       top: { system: 'INT', value: 'M' },
@@ -60,11 +61,13 @@ describe('Profile API', () => {
     const ana = as(await signUp('ana@example.com'));
     expect((await ana.get('/v1/profile').expect(200)).body).toEqual({
       profile: null,
+      feedback: noFeedback,
     });
 
     const saved = await ana.put('/v1/profile').send(answers).expect(200);
     expect(saved.body).toEqual({
       profile: { ...answers, updatedAt: expect.any(String) },
+      feedback: noFeedback,
     });
     expect((await ana.get('/v1/profile').expect(200)).body).toEqual(saved.body);
   });
@@ -98,6 +101,7 @@ describe('Profile API', () => {
 
     expect((await ben.get('/v1/profile').expect(200)).body).toEqual({
       profile: null,
+      feedback: noFeedback,
     });
     await ben
       .put('/v1/profile')

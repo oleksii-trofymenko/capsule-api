@@ -260,6 +260,7 @@ export function buildStylistGraph(deps: GraphDeps) {
       const outfit = s.outfit ?? { items: [], missing: null, removed: [] };
       emit(config, {
         type: 'outfit',
+        id: null, // StylistService saves the outfit and fills this in.
         occasion: s.occasion?.id ?? null,
         items: outfit.items.map((i) => ({ id: i.id, name: i.name })),
         removed: outfit.removed,

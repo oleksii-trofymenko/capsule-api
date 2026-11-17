@@ -1,4 +1,5 @@
 import {
+  boolean,
   index,
   integer,
   jsonb,
@@ -195,7 +196,36 @@ export const styleProfiles = pgTable('style_profiles', {
     .defaultNow(),
 });
 
+/** An item as it was when the outfit was suggested; survives the item being deleted. */
+export interface OutfitItemSnapshot {
+  itemId: string;
+  name: string;
+}
+
+/** Outfits the stylist suggested, with the person's feedback on each. */
+export const outfits = pgTable(
+  'outfits',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    occasionId: text('occasion_id'),
+    items: jsonb('items').$type<OutfitItemSnapshot[]>().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    /** Like and dislike exclude each other; wearing an outfit is separate. */
+    rating: text('rating', { enum: ['like', 'dislike'] }),
+    worn: boolean('worn').notNull().default(false),
+    note: text('note'),
+    feedbackAt: timestamp('feedback_at', { withTimezone: true }),
+  },
+  (t) => [index('outfits_user_idx').on(t.userId)],
+);
+
 export type User = typeof users.$inferSelect;
 export type PhotoRow = typeof photos.$inferSelect;
 export type WardrobeItemRow = typeof wardrobeItems.$inferSelect;
 export type StyleProfileRow = typeof styleProfiles.$inferSelect;
+export type OutfitRow = typeof outfits.$inferSelect;
