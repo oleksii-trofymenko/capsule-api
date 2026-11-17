@@ -49,6 +49,8 @@ describe('OccasionsService.find', () => {
     ['wedding', 'wedding-guest'],
     ["my sister's wedding next Saturday", 'wedding-guest'],
     ['BLACK-TIE gala', 'black-tie'],
+    ['What should I wear to a wedding?', 'wedding-guest'],
+    ['Wedding, next week.', 'wedding-guest'],
   ])('finds %s', (phrase, id) => {
     expect(occasions.find(phrase, 'en')?.id).toBe(id);
   });

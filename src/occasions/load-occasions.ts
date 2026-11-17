@@ -7,6 +7,7 @@ import {
   occasionTextFileSchema,
   type Rule,
 } from './occasion.schemas.js';
+import { normalise } from './normalise.js';
 
 /** The loaded library. Provided by OccasionsModule from data/occasions; tests pass their own. */
 export const OCCASION_LIBRARY = Symbol('OCCASION_LIBRARY');
@@ -25,10 +26,6 @@ export interface Occasion {
     }
   >;
 }
-
-/** Lower case, single spaces, dashes as spaces: "Black-Tie  Gala" is "black tie gala". */
-export const normalise = (s: string) =>
-  s.toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
 
 /**
  * Joins the structure file with every locale's text and checks they agree.

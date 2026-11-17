@@ -23,6 +23,9 @@ describe('mentions', () => {
     ['Grey marl t-shirt', 't-shirt', true],
     ['Leather flip-flops', 'flip-flop', true],
     ['TRAINERS', 'trainer', true],
+    ['White T shirt', 't-shirt', true],
+    ['Grey tshirt', 't-shirt', true],
+    ['Black flip flops', 'flip-flop', true],
   ])('%s mentions %s: %s', (text, word, expected) => {
     expect(mentions(text, word)).toBe(expected);
   });
@@ -64,9 +67,37 @@ describe('checkOutfit', () => {
     expect(checkOutfit([rule], [shirt, trousers])).toEqual([
       { ruleId: 'no-white', items: ['White cotton shirt'] },
     ]);
+    const twoTone = item('Silk dress', 'dress', 'black and white', 'formal');
+    expect(checkOutfit([rule], [twoTone])).toEqual([]);
     const dress = item('Ivory silk dress', 'dress', 'ivory', 'formal');
     expect(checkOutfit([rule], [dress, blazer])).toEqual([
       { ruleId: 'no-white', items: ['Ivory silk dress'] },
+    ]);
+  });
+
+  it('judges the main colour the same way whatever order the items come in', () => {
+    const rule: Rule = {
+      id: 'no-white',
+      type: 'forbidMainColour',
+      colours: ['white'],
+    };
+    const whiteCoat = item('White trench coat', 'outerwear', 'white');
+    const flagged = [{ ruleId: 'no-white', items: ['White trench coat'] }];
+    expect(checkOutfit([rule], [blazer, whiteCoat, shirt])).toEqual(flagged);
+    expect(checkOutfit([rule], [whiteCoat, blazer, shirt])).toEqual(flagged);
+  });
+
+  it('reads a colour by its leading words', () => {
+    const rule: Rule = {
+      id: 'dark',
+      type: 'onlyColours',
+      colours: ['charcoal'],
+      categories: ['bottom'],
+    };
+    const lead = item('Wool trousers', 'bottom', 'charcoal and pink');
+    const tail = item('Silk trousers', 'bottom', 'pink and charcoal');
+    expect(checkOutfit([rule], [lead, tail])).toEqual([
+      { ruleId: 'dark', items: ['Silk trousers'] },
     ]);
   });
 

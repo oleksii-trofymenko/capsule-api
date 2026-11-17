@@ -1,7 +1,11 @@
 {
   "wedding-guest": {
     "name": "Wedding guest",
-    "aliases": ["wedding", "wedding reception", "wedding ceremony"],
+    "aliases": [
+      "wedding",
+      "wedding reception",
+      "wedding ceremony"
+    ],
     "guidance": "Tailored and celebratory. A suit or blazer with smart trousers, or a dress. Leave white to the couple.",
     "rules": {
       "formal": "Wear formal pieces.",
@@ -11,7 +15,12 @@
   },
   "black-tie": {
     "name": "Black tie",
-    "aliases": ["black-tie", "gala", "black tie gala", "black tie dinner"],
+    "aliases": [
+      "black-tie",
+      "gala",
+      "black tie gala",
+      "black tie dinner"
+    ],
     "guidance": "The most formal evening dress: a dinner suit with a bow tie, or a floor-length gown.",
     "rules": {
       "formal": "Wear formal pieces only.",
@@ -20,7 +29,11 @@
   },
   "cocktail-party": {
     "name": "Cocktail party",
-    "aliases": ["cocktails", "drinks party", "evening party"],
+    "aliases": [
+      "cocktails",
+      "drinks party",
+      "evening party"
+    ],
     "guidance": "Polished evening wear: a dark suit or a knee-length dress, with something that catches the light.",
     "rules": {
       "smart": "Wear smart or formal pieces.",
@@ -29,7 +42,10 @@
   },
   "job-interview": {
     "name": "Job interview",
-    "aliases": ["interview", "job interview"],
+    "aliases": [
+      "interview",
+      "job interview"
+    ],
     "guidance": "One step smarter than the workplace wears day to day, in muted colours. Everything pressed.",
     "rules": {
       "smart": "Wear smart or formal pieces.",
@@ -38,7 +54,10 @@
   },
   "office": {
     "name": "Office",
-    "aliases": ["work", "office day", "workplace"],
+    "aliases": [
+      "office day",
+      "workplace"
+    ],
     "guidance": "Smart casual: a shirt or fine knit with trousers or chinos.",
     "rules": {
       "no-sportswear": "No sportswear or flip-flops."
@@ -46,7 +65,10 @@
   },
   "first-date": {
     "name": "First date",
-    "aliases": ["date", "date night"],
+    "aliases": [
+      "date",
+      "date night"
+    ],
     "guidance": "Relaxed but considered. Something you are comfortable in for hours.",
     "rules": {
       "no-gym-wear": "No gym wear."
@@ -54,7 +76,11 @@
   },
   "dinner-out": {
     "name": "Dinner out",
-    "aliases": ["dinner", "restaurant", "dinner at a restaurant"],
+    "aliases": [
+      "dinner",
+      "restaurant",
+      "dinner at a restaurant"
+    ],
     "guidance": "Smart casual for most restaurants; one step up for somewhere special.",
     "rules": {
       "no-beach-or-gym-wear": "No flip-flops, swimwear or gym wear."
@@ -62,7 +88,10 @@
   },
   "funeral": {
     "name": "Funeral",
-    "aliases": ["memorial", "memorial service", "wake"],
+    "aliases": [
+      "memorial",
+      "memorial service"
+    ],
     "guidance": "Dark, plain and understated. A white or pale shirt under dark layers is fine.",
     "rules": {
       "smart": "Wear smart or formal pieces.",
@@ -72,7 +101,11 @@
   },
   "garden-party": {
     "name": "Garden party",
-    "aliases": ["garden party", "summer party", "lawn party"],
+    "aliases": [
+      "garden party",
+      "summer party",
+      "lawn party"
+    ],
     "guidance": "Light, smart daytime dressing: linen, cotton and colour. Shoes that cope with grass.",
     "rules": {
       "smart": "Wear smart pieces.",
@@ -81,22 +114,33 @@
   },
   "weekend": {
     "name": "Weekend",
-    "aliases": ["casual", "day off", "running errands"],
+    "aliases": [
+      "day off",
+      "running errands"
+    ],
     "guidance": "Comfortable layers suited to the weather.",
     "rules": {}
   },
   "beach-holiday": {
     "name": "Beach holiday",
-    "aliases": ["beach", "holiday", "seaside"],
+    "aliases": [
+      "beach",
+      "seaside"
+    ],
     "guidance": "Light, breathable and easy to pack: linen, cotton, sandals.",
     "rules": {
       "relaxed": "Nothing formal.",
-      "no-heavy-pieces": "No wool, tweed, overcoats or heavy boots."
+      "no-heavy-pieces": "No wool, tweed, overcoats or boots."
     }
   },
   "country-walk": {
     "name": "Country walk",
-    "aliases": ["walk", "countryside walk", "hike", "hiking"],
+    "aliases": [
+      "walk",
+      "countryside walk",
+      "hike",
+      "hiking"
+    ],
     "guidance": "Practical layers and shoes with grip. Something that copes with rain.",
     "rules": {
       "relaxed": "Nothing formal.",

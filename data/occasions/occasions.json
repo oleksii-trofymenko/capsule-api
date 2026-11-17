@@ -81,7 +81,7 @@
       "formality": "casual",
       "rules": [
         { "id": "relaxed", "type": "maxFormality", "level": "smart" },
-        { "id": "no-heavy-pieces", "type": "forbidItems", "words": ["overcoat", "wool", "woollen", "tweed", "chelsea"] }
+        { "id": "no-heavy-pieces", "type": "forbidItems", "words": ["overcoat", "wool", "woollen", "tweed", "boot"] }
       ]
     },
     {

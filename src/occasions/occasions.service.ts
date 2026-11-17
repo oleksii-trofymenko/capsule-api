@@ -1,11 +1,8 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { Locale } from '../locale.js';
 import { checkOutfit, type OutfitItem } from './check-outfit.js';
-import {
-  normalise,
-  OCCASION_LIBRARY,
-  type Occasion,
-} from './load-occasions.js';
+import { OCCASION_LIBRARY, type Occasion } from './load-occasions.js';
+import { normalise } from './normalise.js';
 
 export interface RuleBreak {
   ruleId: string;

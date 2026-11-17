@@ -45,6 +45,16 @@ describe('OccasionsService.find', () => {
   it('finds nothing for an occasion it does not know', () => {
     expect(occasions.find('moon landing', 'en')).toBeUndefined();
   });
+
+  it.each([
+    ['a casual date', 'first-date'],
+    ['Funeral, next week', 'funeral'],
+    ['Christmas holiday party', undefined],
+    ['What should I wear to work out at the gym?', undefined],
+    ['What should I wear when I wake up?', undefined],
+  ])('does not let a generic word pick the occasion: %s', (phrase, id) => {
+    expect(occasions.find(phrase, 'en')?.id).toBe(id);
+  });
 });
 
 describe('OccasionsService.check', () => {
@@ -88,6 +98,13 @@ describe('OccasionsService.check', () => {
         .check('funeral', [overcoat, shirt, trousers, brogues], 'en')
         .map((b) => b.ruleId),
     ).toEqual(['dark-colours']);
+  });
+
+  it('rules out boots for the beach, as its message says', () => {
+    const boots = item('Black ankle boots', 'shoes', 'black', 'casual');
+    expect(
+      occasions.check('beach-holiday', [boots], 'en').map((b) => b.ruleId),
+    ).toEqual(['no-heavy-pieces']);
   });
 
   it('rules out a wool overcoat for the beach', () => {
