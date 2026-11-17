@@ -7,7 +7,14 @@ export class OllamaProvider implements ModelProvider {
   constructor(private readonly baseUrl: string) {}
 
   chat(model: string) {
-    return new ChatOllama({ baseUrl: this.baseUrl, model, temperature: 0.2 });
+    // Thinking models (gemma4) otherwise spend most of their output on a hidden
+    // reasoning channel: replies took 20 to 40 s and often came back empty.
+    return new ChatOllama({
+      baseUrl: this.baseUrl,
+      model,
+      temperature: 0.2,
+      think: false,
+    });
   }
 
   embeddings(model: string) {
