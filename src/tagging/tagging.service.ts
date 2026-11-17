@@ -15,7 +15,8 @@ import {
   OBJECT_STORAGE,
   type ObjectStorage,
 } from '../storage/object-storage.js';
-import { taggingPrompts, type Locale } from './tagging.prompts.js';
+import type { Locale } from '../locale.js';
+import { taggingPrompts } from './tagging.prompts.js';
 import { normaliseTags, photoTagsSchema } from './tagging.schemas.js';
 
 /** English only for now; the user's locale is not modelled yet. */
