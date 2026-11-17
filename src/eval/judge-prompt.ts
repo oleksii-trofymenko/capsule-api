@@ -1,4 +1,4 @@
-import type { Locale } from '../stylist/persona.js';
+import type { Locale } from '../locale.js';
 
 /** Instructions for the model that grades the stylist's replies, keyed by locale. */
 export const judgePrompts: Record<Locale, string> = {

@@ -1,4 +1,4 @@
-import type { Locale } from '../stylist/persona.js';
+import type { Locale } from '../locale.js';
 
 export interface EvalScenario {
   id: string;

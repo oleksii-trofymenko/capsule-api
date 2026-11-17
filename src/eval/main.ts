@@ -13,7 +13,7 @@ import { ModelsModule } from '../models/models.module.js';
 import { PlaygroundModule } from '../playground/playground.module.js';
 import { PlaygroundService } from '../playground/playground.service.js';
 import { sampleWardrobe } from '../playground/sample-data.js';
-import type { Locale } from '../stylist/persona.js';
+import type { Locale } from '../locale.js';
 import { runEval, ruleResults, summarise, type Subject } from './evaluate.js';
 import { createJudge } from './judge.js';
 import { evalScenarios } from './scenarios.js';

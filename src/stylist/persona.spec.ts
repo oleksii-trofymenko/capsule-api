@@ -1,7 +1,8 @@
 import { stylistExamples } from './examples.js';
-import { stylistPersona, type Locale } from './persona.js';
+import { LOCALES } from '../locale.js';
+import { stylistPersona } from './persona.js';
 
-const locales = Object.keys(stylistPersona) as Locale[];
+const locales = LOCALES;
 
 describe.each(locales)('stylist data for %s', (locale) => {
   it('keeps the persona short enough for a small local model', () => {

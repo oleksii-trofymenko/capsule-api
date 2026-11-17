@@ -1,4 +1,4 @@
-import type { Locale } from './persona.js';
+import type { Locale } from '../locale.js';
 
 export interface StylistExample {
   id: string;
