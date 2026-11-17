@@ -24,6 +24,10 @@ export class FakeObjectStorage implements ObjectStorage {
     return `https://storage.test/${key}?X-Amz-Signature=fake`;
   }
 
+  async presignDownload(key: string, expiresInSeconds: number) {
+    return `https://storage.test/${key}?X-Amz-Expires=${expiresInSeconds}&download`;
+  }
+
   async get(key: string) {
     const body = this.bodies.get(key);
     if (!body) throw new Error(`No object ${key}`);

@@ -1222,6 +1222,12 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
+                    "photoUrl": {
+                      "nullable": true,
+                      "description": "A link to the photo that works for 15 minutes; refetch for a new one",
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -1242,6 +1248,7 @@
                     "seasons",
                     "size",
                     "photoId",
+                    "photoUrl",
                     "createdAt",
                     "updatedAt"
                   ],
@@ -1360,6 +1367,12 @@
                             "format": "uuid",
                             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                           },
+                          "photoUrl": {
+                            "nullable": true,
+                            "description": "A link to the photo that works for 15 minutes; refetch for a new one",
+                            "type": "string",
+                            "format": "uri"
+                          },
                           "createdAt": {
                             "type": "string",
                             "format": "date-time",
@@ -1380,6 +1393,7 @@
                           "seasons",
                           "size",
                           "photoId",
+                          "photoUrl",
                           "createdAt",
                           "updatedAt"
                         ],
@@ -1510,6 +1524,12 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
+                    "photoUrl": {
+                      "nullable": true,
+                      "description": "A link to the photo that works for 15 minutes; refetch for a new one",
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -1530,6 +1550,7 @@
                     "seasons",
                     "size",
                     "photoId",
+                    "photoUrl",
                     "createdAt",
                     "updatedAt"
                   ],
@@ -1741,6 +1762,12 @@
                       "format": "uuid",
                       "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                     },
+                    "photoUrl": {
+                      "nullable": true,
+                      "description": "A link to the photo that works for 15 minutes; refetch for a new one",
+                      "type": "string",
+                      "format": "uri"
+                    },
                     "createdAt": {
                       "type": "string",
                       "format": "date-time",
@@ -1761,6 +1788,7 @@
                     "seasons",
                     "size",
                     "photoId",
+                    "photoUrl",
                     "createdAt",
                     "updatedAt"
                   ],

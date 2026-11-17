@@ -46,6 +46,12 @@ export const itemIdSchema = z.uuid();
 export const itemSchema = z.object({
   id: z.uuid(),
   ...itemFields,
+  photoUrl: z
+    .url()
+    .nullable()
+    .describe(
+      'A link to the photo that works for 15 minutes; refetch for a new one',
+    ),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });

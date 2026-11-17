@@ -4,16 +4,26 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { DB, type Db } from '../db/db.module.js';
 import { photos, wardrobeItems, type WardrobeItemRow } from '../db/schema.js';
+import {
+  OBJECT_STORAGE,
+  type ObjectStorage,
+} from '../storage/object-storage.js';
 import type {
   CreateItemInput,
   UpdateItemInput,
   WardrobeItem,
 } from './wardrobe.schemas.js';
 
-const toItem = (row: WardrobeItemRow): WardrobeItem => ({
+/** Long enough to browse the wardrobe; clients refetch the list before links expire. */
+const PHOTO_URL_SECONDS = 15 * 60;
+
+const toItem = (
+  row: WardrobeItemRow,
+  photoUrl: string | null,
+): WardrobeItem => ({
   id: row.id,
   name: row.name,
   category: row.category,
@@ -25,6 +35,7 @@ const toItem = (row: WardrobeItemRow): WardrobeItem => ({
       ? { system: row.sizeSystem, value: row.sizeValue }
       : null,
   photoId: row.photoId,
+  photoUrl,
   createdAt: row.createdAt.toISOString(),
   updatedAt: row.updatedAt.toISOString(),
 });
@@ -37,7 +48,10 @@ const sizeColumns = (size: CreateItemInput['size']) => ({
 
 @Injectable()
 export class WardrobeService {
-  constructor(@Inject(DB) private readonly db: Db) {}
+  constructor(
+    @Inject(DB) private readonly db: Db,
+    @Inject(OBJECT_STORAGE) private readonly storage: ObjectStorage,
+  ) {}
 
   async create(userId: string, input: CreateItemInput): Promise<WardrobeItem> {
     await this.assertOwnUploadedPhoto(userId, input.photoId);
@@ -46,7 +60,7 @@ export class WardrobeService {
       .insert(wardrobeItems)
       .values({ ...fields, ...sizeColumns(size), userId })
       .returning();
-    return toItem(row);
+    return (await this.present(userId, [row]))[0];
   }
 
   async list(userId: string): Promise<WardrobeItem[]> {
@@ -55,7 +69,7 @@ export class WardrobeService {
       .from(wardrobeItems)
       .where(eq(wardrobeItems.userId, userId))
       .orderBy(desc(wardrobeItems.createdAt), desc(wardrobeItems.id));
-    return rows.map(toItem);
+    return this.present(userId, rows);
   }
 
   async get(userId: string, id: string): Promise<WardrobeItem> {
@@ -65,7 +79,7 @@ export class WardrobeService {
       .where(this.owned(userId, id))
       .limit(1);
     if (!row) throw new NotFoundException('Item not found');
-    return toItem(row);
+    return (await this.present(userId, [row]))[0];
   }
 
   async update(
@@ -87,7 +101,7 @@ export class WardrobeService {
       .where(this.owned(userId, id))
       .returning();
     if (!row) throw new NotFoundException('Item not found');
-    return toItem(row);
+    return (await this.present(userId, [row]))[0];
   }
 
   async remove(userId: string, id: string): Promise<void> {
@@ -96,6 +110,31 @@ export class WardrobeService {
       .where(this.owned(userId, id))
       .returning({ id: wardrobeItems.id });
     if (deleted.length === 0) throw new NotFoundException('Item not found');
+  }
+
+  /** Items as the API returns them, with a short-lived link to each one's photo. */
+  private async present(
+    userId: string,
+    rows: WardrobeItemRow[],
+  ): Promise<WardrobeItem[]> {
+    const photoIds = rows.flatMap((r) => (r.photoId ? [r.photoId] : []));
+    const keys = new Map<string, string>();
+    if (photoIds.length > 0) {
+      const found = await this.db
+        .select({ id: photos.id, key: photos.storageKey })
+        .from(photos)
+        .where(and(eq(photos.userId, userId), inArray(photos.id, photoIds)));
+      for (const p of found) keys.set(p.id, p.key);
+    }
+    return Promise.all(
+      rows.map(async (row) => {
+        const key = row.photoId ? keys.get(row.photoId) : undefined;
+        const url = key
+          ? await this.storage.presignDownload(key, PHOTO_URL_SECONDS)
+          : null;
+        return toItem(row, url);
+      }),
+    );
   }
 
   private owned(userId: string, id: string) {
