@@ -5,7 +5,7 @@ import {
   type BaseMessage,
 } from '@langchain/core/messages';
 import { z } from 'zod';
-import type { Locale } from '../stylist/persona.js';
+import type { Locale } from '../locale.js';
 import type { Transcript } from './checks.js';
 import { judgePrompts } from './judge-prompt.js';
 import type { EvalScenario } from './scenarios.js';

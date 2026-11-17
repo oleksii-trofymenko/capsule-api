@@ -4,6 +4,9 @@
 any change to a prompt, the graph, retrieval or a model, and put the score in the commit or pull
 request. A change that lowers the score beyond the run-to-run spread below is not finished.
 
+**Current reference: 94.2 ±1.2, the stylist graph (T11).** Compare changes with that. The T04
+baseline (92.0, the old playground chat) is kept below as history.
+
 It needs Ollama with the configured models. It does not need the database or the API server.
 A run takes about four minutes on the development machine. Full replies and verdicts are written
 to `eval-results/`, which git ignores.
@@ -27,8 +30,14 @@ in code without asking the judge.
 
 - The judge is the same local model as the stylist, so it is lenient with its own habits. The
   code checks carry the rules that matter most for that reason.
-- Scenarios use the playground's sample wardrobe and occasions until the real ones exist (T07,
-  T10). The stylist under test is the playground chat until the stylist graph (T11) replaces it.
+- The stylist under test is the stylist graph (`src/stylist/`) with the occasion library. The
+  person owns the playground's sample wardrobe, passed in memory so the judge's list of owned
+  items matches exactly, and has no style profile.
+- Scenarios still name the old playground's tools. The graph has no tools; it reports what it
+  gave the model on that turn, and `src/eval/main.ts` maps it: wardrobe to `search_wardrobe`,
+  dress code to `get_dress_code`, date to `get_today`. Because the graph always loads these for an
+  outfit or an answer, some of those checks now pass by construction. Renaming the checks to
+  capabilities is a separate evaluation revision.
 - Replies vary between runs at temperature 0.2. Compare a change against the spread, not a single
   number.
 
@@ -57,3 +66,26 @@ Scenarios that failed in both runs, and why:
 Seen in one run each: `black-tie` and `size-from-photo` returned an empty reply. The first
 loops on occasion lookups until the playground's limit of six model calls; the second produced
 nothing at all.
+
+## Stylist graph (T11)
+
+2026-11-17. The stylist graph replaces the playground chat as the subject; same model, judge and
+scenarios. Three runs:
+
+| Run | Rules | Tone | Wearability | Score |
+| --- | ----- | ---- | ----------- | ----- |
+| 1   | 98.5  | 89.2 | 94.8        | 94.2  |
+| 2   | 98.5  | 90.8 | 96.9        | 95.4  |
+| 3   | 98.0  | 87.5 | 93.8        | 93.1  |
+
+**Mean 94.2, spread ±1.2: above the T04 baseline of 92.0.** Without the tool-name checks, rules
+rose from 95.0 and 95.5 to 98.3; the baseline passed all of those checks too, so the gain is not
+structural. A median scenario now takes about 1 s.
+
+Two changes got it there. Thinking is off for Ollama chat models: gemma4 otherwise spent most of
+its output on a hidden reasoning channel, and graph replies took 20 to 40 s and often came back
+empty (score 68.3). The persona no longer mentions tools: it told the model to use a "wardrobe
+tool", so with the wardrobe given in the prompt it said the items were not there (score 90.0).
+
+Still failing in some runs: `garden-party` (no linen named), `feedback-too-stiff` (the swap is
+not named as a jumper or waxed jacket), `winter-pieces`, `trend-wide-leg` and `forecast`.
