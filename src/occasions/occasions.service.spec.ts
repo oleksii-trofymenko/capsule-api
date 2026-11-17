@@ -1,0 +1,91 @@
+import type { OutfitItem } from './check-outfit.js';
+import { OccasionsService } from './occasions.service.js';
+
+const occasions = new OccasionsService();
+
+const item = (
+  name: string,
+  category: OutfitItem['category'],
+  colour: string,
+  formality: OutfitItem['formality'],
+): OutfitItem => ({ name, category, colour, formality });
+
+const blazer = item('Navy wool blazer', 'outerwear', 'navy', 'formal');
+const shirt = item('White cotton shirt', 'top', 'white', 'formal');
+const trousers = item('Charcoal wool trousers', 'bottom', 'charcoal', 'formal');
+const brogues = item('Black leather brogues', 'shoes', 'black', 'formal');
+const trainers = item('White leather trainers', 'shoes', 'white', 'casual');
+const overcoat = item('Camel wool overcoat', 'outerwear', 'camel', 'smart');
+
+describe('OccasionsService.find', () => {
+  it.each([
+    ['Wedding guest', 'wedding-guest'],
+    ['wedding', 'wedding-guest'],
+    ['BLACK-TIE gala', 'black-tie'],
+    ["my sister's wedding next Saturday", 'wedding-guest'],
+    ['a black tie dinner at the museum', 'black-tie'],
+    ['going on a hike', 'country-walk'],
+  ])('finds %s', (phrase, id) => {
+    expect(occasions.find(phrase, 'en')?.id).toBe(id);
+  });
+
+  it('finds nothing for an occasion it does not know', () => {
+    expect(occasions.find('moon landing', 'en')).toBeUndefined();
+  });
+});
+
+describe('OccasionsService.check', () => {
+  it('passes a classic wedding outfit, white shirt under a navy blazer included', () => {
+    expect(
+      occasions.check(
+        'wedding-guest',
+        [blazer, shirt, trousers, brogues],
+        'en',
+      ),
+    ).toEqual([]);
+  });
+
+  it('explains why trainers do not work at a wedding', () => {
+    expect(
+      occasions.check(
+        'wedding-guest',
+        [blazer, shirt, trousers, trainers],
+        'en',
+      ),
+    ).toEqual([
+      {
+        ruleId: 'formal',
+        items: ['White leather trainers'],
+        message: 'Wear formal pieces.',
+      },
+      {
+        ruleId: 'no-casual-pieces',
+        items: ['White leather trainers'],
+        message: 'No jeans, trainers, hoodies or t-shirts.',
+      },
+    ]);
+  });
+
+  it('keeps a funeral dark, but allows a white shirt', () => {
+    expect(
+      occasions.check('funeral', [blazer, shirt, trousers, brogues], 'en'),
+    ).toEqual([]);
+    expect(
+      occasions
+        .check('funeral', [overcoat, shirt, trousers, brogues], 'en')
+        .map((b) => b.ruleId),
+    ).toEqual(['dark-colours']);
+  });
+
+  it('rules out a wool overcoat for the beach', () => {
+    expect(
+      occasions.check('beach-holiday', [overcoat], 'en').map((b) => b.ruleId),
+    ).toEqual(['no-heavy-pieces']);
+  });
+
+  it('refuses an occasion id it does not know', () => {
+    expect(() => occasions.check('moon-landing', [], 'en')).toThrow(
+      'Unknown occasion "moon-landing"',
+    );
+  });
+});

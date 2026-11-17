@@ -9,6 +9,7 @@ import { DbModule } from './db/db.module.js';
 import { HealthController } from './health/health.controller.js';
 import { MetricsModule } from './metrics/metrics.module.js';
 import { ModelsModule } from './models/models.module.js';
+import { OccasionsModule } from './occasions/occasions.module.js';
 import { PhotosModule } from './photos/photos.module.js';
 import { PlaygroundModule } from './playground/playground.module.js';
 import { ProfileModule } from './profile/profile.module.js';
@@ -37,6 +38,7 @@ import { WardrobeModule } from './wardrobe/wardrobe.module.js';
     PhotosModule,
     WardrobeModule,
     ProfileModule,
+    OccasionsModule,
   ],
   controllers: [HealthController],
   // Order matters: rate limiting runs before authentication.

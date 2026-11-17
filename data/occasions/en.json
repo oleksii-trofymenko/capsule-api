@@ -1,0 +1,106 @@
+{
+  "wedding-guest": {
+    "name": "Wedding guest",
+    "aliases": ["wedding", "wedding reception", "wedding ceremony"],
+    "guidance": "Tailored and celebratory. A suit or blazer with smart trousers, or a dress. Leave white to the couple.",
+    "rules": {
+      "formal": "Wear formal pieces.",
+      "no-white": "Do not wear white, ivory or cream as the main colour.",
+      "no-casual-pieces": "No jeans, trainers, hoodies or t-shirts."
+    }
+  },
+  "black-tie": {
+    "name": "Black tie",
+    "aliases": ["black-tie", "gala", "black tie gala", "black tie dinner"],
+    "guidance": "The most formal evening dress: a dinner suit with a bow tie, or a floor-length gown.",
+    "rules": {
+      "formal": "Wear formal pieces only.",
+      "no-casual-pieces": "No jeans, trainers, chinos, boots, hoodies or t-shirts."
+    }
+  },
+  "cocktail-party": {
+    "name": "Cocktail party",
+    "aliases": ["cocktails", "drinks party", "evening party"],
+    "guidance": "Polished evening wear: a dark suit or a knee-length dress, with something that catches the light.",
+    "rules": {
+      "smart": "Wear smart or formal pieces.",
+      "no-sportswear": "No trainers or sportswear."
+    }
+  },
+  "job-interview": {
+    "name": "Job interview",
+    "aliases": ["interview", "job interview"],
+    "guidance": "One step smarter than the workplace wears day to day, in muted colours. Everything pressed.",
+    "rules": {
+      "smart": "Wear smart or formal pieces.",
+      "no-casual-pieces": "No trainers, hoodies, t-shirts, ripped pieces or flip-flops."
+    }
+  },
+  "office": {
+    "name": "Office",
+    "aliases": ["work", "office day", "workplace"],
+    "guidance": "Smart casual: a shirt or fine knit with trousers or chinos.",
+    "rules": {
+      "no-sportswear": "No sportswear or flip-flops."
+    }
+  },
+  "first-date": {
+    "name": "First date",
+    "aliases": ["date", "date night"],
+    "guidance": "Relaxed but considered. Something you are comfortable in for hours.",
+    "rules": {
+      "no-gym-wear": "No gym wear."
+    }
+  },
+  "dinner-out": {
+    "name": "Dinner out",
+    "aliases": ["dinner", "restaurant", "dinner at a restaurant"],
+    "guidance": "Smart casual for most restaurants; one step up for somewhere special.",
+    "rules": {
+      "no-beach-or-gym-wear": "No flip-flops, swimwear or gym wear."
+    }
+  },
+  "funeral": {
+    "name": "Funeral",
+    "aliases": ["memorial", "memorial service", "wake"],
+    "guidance": "Dark, plain and understated. A white or pale shirt under dark layers is fine.",
+    "rules": {
+      "smart": "Wear smart or formal pieces.",
+      "dark-colours": "Keep trousers, skirts, dresses, outer layers and shoes dark.",
+      "no-bold-pieces": "No florals, prints, sequins, jeans or trainers."
+    }
+  },
+  "garden-party": {
+    "name": "Garden party",
+    "aliases": ["garden party", "summer party", "lawn party"],
+    "guidance": "Light, smart daytime dressing: linen, cotton and colour. Shoes that cope with grass.",
+    "rules": {
+      "smart": "Wear smart pieces.",
+      "no-stilettos": "No stilettos: they sink into the lawn."
+    }
+  },
+  "weekend": {
+    "name": "Weekend",
+    "aliases": ["casual", "day off", "running errands"],
+    "guidance": "Comfortable layers suited to the weather.",
+    "rules": {}
+  },
+  "beach-holiday": {
+    "name": "Beach holiday",
+    "aliases": ["beach", "holiday", "seaside"],
+    "guidance": "Light, breathable and easy to pack: linen, cotton, sandals.",
+    "rules": {
+      "relaxed": "Nothing formal.",
+      "no-heavy-pieces": "No wool, tweed, overcoats or heavy boots."
+    }
+  },
+  "country-walk": {
+    "name": "Country walk",
+    "aliases": ["walk", "countryside walk", "hike", "hiking"],
+    "guidance": "Practical layers and shoes with grip. Something that copes with rain.",
+    "rules": {
+      "relaxed": "Nothing formal.",
+      "no-delicate-shoes": "No heels, suede, brogues or loafers."
+    }
+  }
+}

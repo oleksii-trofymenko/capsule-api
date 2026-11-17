@@ -1,0 +1,96 @@
+{
+  "occasions": [
+    {
+      "id": "wedding-guest",
+      "formality": "formal",
+      "rules": [
+        { "id": "formal", "type": "minFormality", "level": "formal" },
+        { "id": "no-white", "type": "forbidMainColour", "colours": ["white", "ivory", "cream", "off-white"] },
+        { "id": "no-casual-pieces", "type": "forbidItems", "words": ["jeans", "denim", "trainer", "sneaker", "hoodie", "t-shirt"] }
+      ]
+    },
+    {
+      "id": "black-tie",
+      "formality": "formal",
+      "rules": [
+        { "id": "formal", "type": "minFormality", "level": "formal" },
+        { "id": "no-casual-pieces", "type": "forbidItems", "words": ["jeans", "denim", "trainer", "sneaker", "hoodie", "t-shirt", "chino", "boot"] }
+      ]
+    },
+    {
+      "id": "cocktail-party",
+      "formality": "smart",
+      "rules": [
+        { "id": "smart", "type": "minFormality", "level": "smart" },
+        { "id": "no-sportswear", "type": "forbidItems", "words": ["trainer", "sneaker", "hoodie", "jogger", "tracksuit", "legging"] }
+      ]
+    },
+    {
+      "id": "job-interview",
+      "formality": "formal",
+      "rules": [
+        { "id": "smart", "type": "minFormality", "level": "smart" },
+        { "id": "no-casual-pieces", "type": "forbidItems", "words": ["trainer", "sneaker", "hoodie", "t-shirt", "ripped", "flip-flop"] }
+      ]
+    },
+    {
+      "id": "office",
+      "formality": "smart",
+      "rules": [
+        { "id": "no-sportswear", "type": "forbidItems", "words": ["hoodie", "jogger", "tracksuit", "legging", "flip-flop"] }
+      ]
+    },
+    {
+      "id": "first-date",
+      "formality": "smart",
+      "rules": [
+        { "id": "no-gym-wear", "type": "forbidItems", "words": ["tracksuit", "jogger", "gym"] }
+      ]
+    },
+    {
+      "id": "dinner-out",
+      "formality": "smart",
+      "rules": [
+        { "id": "no-beach-or-gym-wear", "type": "forbidItems", "words": ["flip-flop", "tracksuit", "jogger", "swim", "swimsuit", "swimwear"] }
+      ]
+    },
+    {
+      "id": "funeral",
+      "formality": "formal",
+      "rules": [
+        { "id": "smart", "type": "minFormality", "level": "smart" },
+        { "id": "dark-colours", "type": "onlyColours", "colours": ["black", "navy", "charcoal", "grey", "gray", "dark", "midnight"], "categories": ["bottom", "dress", "outerwear", "shoes"] },
+        { "id": "no-bold-pieces", "type": "forbidItems", "words": ["floral", "print", "printed", "sequin", "sequinned", "trainer", "sneaker", "jeans"] }
+      ]
+    },
+    {
+      "id": "garden-party",
+      "formality": "smart",
+      "rules": [
+        { "id": "smart", "type": "minFormality", "level": "smart" },
+        { "id": "no-stilettos", "type": "forbidItems", "words": ["stiletto"] }
+      ]
+    },
+    {
+      "id": "weekend",
+      "formality": "casual",
+      "rules": []
+    },
+    {
+      "id": "beach-holiday",
+      "formality": "casual",
+      "rules": [
+        { "id": "relaxed", "type": "maxFormality", "level": "smart" },
+        { "id": "no-heavy-pieces", "type": "forbidItems", "words": ["overcoat", "wool", "woollen", "tweed", "chelsea"] }
+      ]
+    },
+    {
+      "id": "country-walk",
+      "formality": "casual",
+      "rules": [
+        { "id": "relaxed", "type": "maxFormality", "level": "smart" },
+        { "id": "no-delicate-shoes", "type": "forbidItems", "words": ["heel", "stiletto", "suede", "brogue", "loafer"] }
+      ]
+    }
+  ]
+}
