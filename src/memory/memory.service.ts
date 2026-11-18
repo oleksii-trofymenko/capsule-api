@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { DB, type Db } from '../db/db.module.js';
-import { personalNotes } from '../db/schema.js';
+import { personalNotes, stylistTraces } from '../db/schema.js';
 import type { NewNote, Note } from './memory.schemas.js';
 import type { NoteStore } from './note-store.js';
 
@@ -64,15 +64,22 @@ export class MemoryService implements NoteStore {
     }
   }
 
+  /** Traces hold copies of the prompts, notes included, so forgetting wipes them too. */
   async remove(userId: string, id: string): Promise<void> {
-    const deleted = await this.db
-      .delete(personalNotes)
-      .where(and(eq(personalNotes.id, id), eq(personalNotes.userId, userId)))
-      .returning({ id: personalNotes.id });
-    if (deleted.length === 0) throw new NotFoundException('Note not found');
+    await this.db.transaction(async (tx) => {
+      const deleted = await tx
+        .delete(personalNotes)
+        .where(and(eq(personalNotes.id, id), eq(personalNotes.userId, userId)))
+        .returning({ id: personalNotes.id });
+      if (deleted.length === 0) throw new NotFoundException('Note not found');
+      await tx.delete(stylistTraces).where(eq(stylistTraces.userId, userId));
+    });
   }
 
   async clear(userId: string): Promise<void> {
-    await this.db.delete(personalNotes).where(eq(personalNotes.userId, userId));
+    await this.db.transaction(async (tx) => {
+      await tx.delete(personalNotes).where(eq(personalNotes.userId, userId));
+      await tx.delete(stylistTraces).where(eq(stylistTraces.userId, userId));
+    });
   }
 }

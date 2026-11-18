@@ -4,6 +4,7 @@ import { ModelsModule } from '../models/models.module.js';
 import { OccasionsModule } from '../occasions/occasions.module.js';
 import { OutfitsModule } from '../outfits/outfits.module.js';
 import { ProfileModule } from '../profile/profile.module.js';
+import { TracesModule } from '../traces/traces.module.js';
 import { WardrobeModule } from '../wardrobe/wardrobe.module.js';
 import { STYLIST_CONTEXT } from './context.js';
 import { StylistController } from './stylist.controller.js';
@@ -17,6 +18,7 @@ import { DbContextSource, StylistService } from './stylist.service.js';
     ProfileModule,
     OutfitsModule,
     MemoryModule,
+    TracesModule,
   ],
   controllers: [StylistController],
   providers: [

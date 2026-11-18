@@ -64,6 +64,13 @@
       "when": 1795015968963,
       "tag": "0008_personal-notes",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795017139933,
+      "tag": "0009_stylist-traces",
+      "breakpoints": true
     }
   ]
 }

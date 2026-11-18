@@ -24,7 +24,7 @@ export class StylistController {
   /**
    * Asks the stylist. Streams Server-Sent Events: each step of the graph, the
    * chosen outfit, the reply's tokens, then done. The client sends the whole
-   * conversation; nothing is stored yet.
+   * conversation. The done event carries the id of this answer's trace.
    */
   @Post('chat')
   @HttpCode(200)

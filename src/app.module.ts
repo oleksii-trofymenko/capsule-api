@@ -16,6 +16,7 @@ import { PhotosModule } from './photos/photos.module.js';
 import { PlaygroundModule } from './playground/playground.module.js';
 import { ProfileModule } from './profile/profile.module.js';
 import { StylistModule } from './stylist/stylist.module.js';
+import { TracesModule } from './traces/traces.module.js';
 import { WardrobeModule } from './wardrobe/wardrobe.module.js';
 
 @Module({
@@ -45,6 +46,7 @@ import { WardrobeModule } from './wardrobe/wardrobe.module.js';
     StylistModule,
     KnowledgeModule,
     MemoryModule,
+    TracesModule,
   ],
   controllers: [HealthController],
   // Order matters: rate limiting runs before authentication.

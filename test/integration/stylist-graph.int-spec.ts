@@ -6,6 +6,7 @@ import { readLibrary } from '../../src/occasions/load-occasions.js';
 import { OccasionsService } from '../../src/occasions/occasions.service.js';
 import type { NewNote } from '../../src/memory/memory.schemas.js';
 import type { NewOutfit } from '../../src/outfits/outfit-store.js';
+import type { NewTrace } from '../../src/traces/traces.schemas.js';
 import { sampleWardrobe } from '../../src/playground/sample-data.js';
 import { stylistPrompts } from '../../src/stylist/stylist.prompts.js';
 import type {
@@ -34,6 +35,7 @@ function setup(script: ScriptStep[], notes: NewNote[] = []) {
   );
   const saved: NewOutfit[] = [];
   const remembered: NewNote[] = [];
+  const traces: NewTrace[] = [];
   const stylist = new StylistService(
     router,
     occasions,
@@ -45,8 +47,14 @@ function setup(script: ScriptStep[], notes: NewNote[] = []) {
       },
     },
     { add: async (_userId, added) => void remembered.push(...added) },
+    {
+      save: async (_userId, trace) => {
+        traces.push(trace);
+        return `trace-${traces.length}`;
+      },
+    },
   );
-  return { model, stylist, saved, remembered };
+  return { model, stylist, saved, remembered, traces };
 }
 
 async function run(stylist: StylistService, ...turns: string[]) {
@@ -167,7 +175,7 @@ describe('Stylist graph', () => {
     );
   });
 
-  it('still replies when saving the outfit fails, with no id to attach feedback to', async () => {
+  it('still replies when the database is down, with no outfit or trace id', async () => {
     const model = new ScriptedChatModel([
       understood('outfit'),
       picked(['w08', 'w06']),
@@ -198,6 +206,11 @@ describe('Stylist graph', () => {
           throw new Error('database down');
         },
       },
+      {
+        save: async () => {
+          throw new Error('database down');
+        },
+      },
     );
     const events = await run(stylist, 'Office outfit for Monday?');
 
@@ -206,7 +219,7 @@ describe('Stylist graph', () => {
       items: [{ id: 'w08' }, { id: 'w06' }],
     });
     expect(reply(events)).toBe('Blazer and trousers.');
-    expect(events.at(-1)?.type).toBe('done');
+    expect(events.at(-1)).toMatchObject({ type: 'done', traceId: null });
   });
 
   it('tries compose again after invalid output, and reads "null" as nothing missing', async () => {
@@ -357,8 +370,8 @@ describe('Stylist graph', () => {
     expect(steps(events)).toEqual(['load-context', 'understand', 'answer']);
   });
 
-  it('reports a failure without the details', async () => {
-    const { stylist } = setup([
+  it('reports a failure without the details, and keeps a trace of it', async () => {
+    const { stylist, traces } = setup([
       understood('question'),
       new Error('model crashed: secret internals'),
     ]);
@@ -366,6 +379,60 @@ describe('Stylist graph', () => {
     expect(events.at(-1)).toEqual({
       type: 'error',
       message: 'The stylist could not answer just now. Please try again.',
+      traceId: 'trace-1',
     });
+
+    expect(traces).toHaveLength(1);
+    expect(traces[0]).toMatchObject({ failed: true });
+    expect(traces[0].calls.map((c) => [c.step, c.failed])).toEqual([
+      ['understand', false],
+      ['answer', true],
+    ]);
+    expect(JSON.stringify(traces[0])).not.toContain('secret internals');
+  });
+
+  it('keeps a trace of each answer: every model call with its step, prompt and output', async () => {
+    const { model, stylist, traces } = setup([
+      understood('outfit'),
+      picked(['w08', 'w01']),
+      textChunks('Navy wool blazer, ', 'white shirt.'),
+    ]);
+    const events = await run(stylist, 'What should I wear to a wedding?');
+
+    expect(events.at(-1)).toMatchObject({ type: 'done', traceId: 'trace-1' });
+    const [trace] = traces;
+    expect(trace).toMatchObject({
+      steps: [
+        'load-context',
+        'understand',
+        'retrieve-wardrobe',
+        'compose',
+        'check-rules',
+        'write',
+      ],
+      occasion: 'wedding-guest',
+      outfit: ['Navy wool blazer', 'White cotton shirt'],
+      failed: false,
+    });
+    expect(trace.candidates).toContain('Navy wool blazer');
+    expect(trace.candidates).not.toContain('White leather trainers');
+
+    expect(trace.calls.map((c) => c.step)).toEqual([
+      'understand',
+      'compose',
+      'write',
+    ]);
+    // The prompts exactly as the model received them.
+    expect(trace.calls.map((c) => c.messages.map((m) => m.text))).toEqual(
+      model.received.map((call) => call.map((m) => m.text)),
+    );
+    expect(trace.calls[0].messages.at(-1)).toEqual({
+      role: 'human',
+      text: 'What should I wear to a wedding?',
+    });
+    expect(JSON.parse(trace.calls[1].output ?? '')).toEqual([
+      { itemIds: ['w08', 'w01'], missing: null },
+    ]);
+    expect(trace.calls[2].output).toBe('Navy wool blazer, white shirt.');
   });
 });
