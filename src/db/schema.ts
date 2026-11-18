@@ -11,6 +11,7 @@ import {
   uuid,
   vector,
 } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -280,6 +281,36 @@ export const knowledgePassages = pgTable(
     index('knowledge_passages_embedding_idx').using(
       'hnsw',
       t.embedding.op('vector_cosine_ops'),
+    ),
+  ],
+);
+
+export const NOTE_KINDS = ['like', 'dislike', 'fact'] as const;
+
+/**
+ * Personal memory: what a person told the stylist about themselves, kept
+ * across conversations. Visible to them and deletable; no embeddings, so a
+ * deleted note leaves nothing behind.
+ */
+export const personalNotes = pgTable(
+  'personal_notes',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    kind: text('kind', { enum: NOTE_KINDS }).notNull(),
+    /** A short phrase: "yellow", "skinny jeans", "wears UK 12 in dresses". */
+    text: text('text').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  // Saying the same thing twice keeps one note.
+  (t) => [
+    uniqueIndex('personal_notes_user_text_idx').on(
+      t.userId,
+      sql`lower(${t.text})`,
     ),
   ],
 );

@@ -57,6 +57,13 @@
       "when": 1794993135819,
       "tag": "0007_knowledge-dedupe",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795015968963,
+      "tag": "0008_personal-notes",
+      "breakpoints": true
     }
   ]
 }

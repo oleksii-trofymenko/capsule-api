@@ -7,6 +7,7 @@ import { Module } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { ConfigModule } from '../config/config.module.js';
+import { NOTE_STORE, type NoteStore } from '../memory/note-store.js';
 import { MetricsModule } from '../metrics/metrics.module.js';
 import { ModelRouter } from '../models/model-router.service.js';
 import { ModelsModule } from '../models/models.module.js';
@@ -26,8 +27,11 @@ import { evalScenarios } from './scenarios.js';
 
 /** The person under test owns the sample wardrobe the judge is told about, and has no profile. */
 const sampleContext: StylistContextSource = {
-  load: async () => ({ wardrobe: sampleWardrobe, profile: null }),
+  load: async () => ({ wardrobe: sampleWardrobe, profile: null, notes: [] }),
 };
+
+/** Each scenario is a fresh conversation, so nothing it says is kept for the next. */
+const forgetNotes: NoteStore = { add: async () => {} };
 
 /** Suggested outfits are kept in memory: the evaluation needs no database. */
 let saved = 0;
@@ -41,6 +45,7 @@ const memoryOutfits: OutfitStore = {
     StylistService,
     { provide: STYLIST_CONTEXT, useValue: sampleContext },
     { provide: OUTFIT_STORE, useValue: memoryOutfits },
+    { provide: NOTE_STORE, useValue: forgetNotes },
   ],
 })
 class EvalModule {}

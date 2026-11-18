@@ -8,6 +8,7 @@ import type { Env } from './config/env.js';
 import { DbModule } from './db/db.module.js';
 import { HealthController } from './health/health.controller.js';
 import { KnowledgeModule } from './knowledge/knowledge.module.js';
+import { MemoryModule } from './memory/memory.module.js';
 import { MetricsModule } from './metrics/metrics.module.js';
 import { ModelsModule } from './models/models.module.js';
 import { OccasionsModule } from './occasions/occasions.module.js';
@@ -43,6 +44,7 @@ import { WardrobeModule } from './wardrobe/wardrobe.module.js';
     OccasionsModule,
     StylistModule,
     KnowledgeModule,
+    MemoryModule,
   ],
   controllers: [HealthController],
   // Order matters: rate limiting runs before authentication.

@@ -23,6 +23,10 @@ export type ChatMessage = StylistChatRequest['messages'][number];
 export const understandingSchema = z.object({
   intent: z.enum(['outfit', 'question']),
   enoughToSuggest: z.boolean(),
+  // Loose here so one bad note cannot spoil the classification; each is checked in notes.ts.
+  remember: z
+    .array(z.object({ kind: z.string(), text: z.string() }))
+    .default([]),
 });
 
 /** The compose step's structured output: ids only, checked against the candidates in code. */

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { MemoryModule } from '../memory/memory.module.js';
 import { ModelsModule } from '../models/models.module.js';
 import { OccasionsModule } from '../occasions/occasions.module.js';
 import { OutfitsModule } from '../outfits/outfits.module.js';
@@ -15,6 +16,7 @@ import { DbContextSource, StylistService } from './stylist.service.js';
     WardrobeModule,
     ProfileModule,
     OutfitsModule,
+    MemoryModule,
   ],
   controllers: [StylistController],
   providers: [
