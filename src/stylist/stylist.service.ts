@@ -12,12 +12,15 @@ import {
   type StylistContextSource,
 } from './context.js';
 import { OUTFIT_STORE, type OutfitStore } from '../outfits/outfit-store.js';
+import { TRACE_STORE, type TraceStore } from '../traces/trace-store.js';
+import type { NewTrace } from '../traces/traces.schemas.js';
 import { buildStylistGraph, type StylistGraph } from './graph.js';
 import type {
   Consulted,
   StylistChatRequest,
   StylistEvent,
 } from './stylist.schemas.js';
+import { TraceRecorder } from './trace-recorder.js';
 
 /** English only for now; the user's locale is not modelled yet. */
 const LOCALE: Locale = 'en';
@@ -56,6 +59,7 @@ export class StylistService {
     @Inject(STYLIST_CONTEXT) context: StylistContextSource,
     @Inject(OUTFIT_STORE) private readonly outfits: OutfitStore,
     @Inject(NOTE_STORE) notes: NoteStore,
+    @Inject(TRACE_STORE) private readonly traces: TraceStore,
   ) {
     this.graph = buildStylistGraph({
       models,
@@ -77,34 +81,70 @@ export class StylistService {
     const elapsed = () => Math.round(performance.now() - started);
     let firstTokenMs: number | null = null;
     let consulted: Consulted[] = [];
+    const recorder = new TraceRecorder();
+    const trace: Omit<NewTrace, 'calls' | 'failed'> = {
+      steps: [],
+      occasion: null,
+      candidates: [],
+      outfit: [],
+    };
     try {
       const stream = await this.graph.stream(
         { userId, locale: LOCALE, now, messages: request.messages },
-        { streamMode: ['custom', 'values'], signal },
+        { streamMode: ['custom', 'values'], signal, callbacks: [recorder] },
       );
       for await (const [mode, chunk] of stream) {
         if (mode === 'values') {
           consulted = chunk.consulted;
+          trace.occasion = chunk.occasion?.id ?? null;
+          trace.candidates = chunk.candidates.map((i) => i.name);
           continue;
         }
         // Custom chunks are the StylistEvents the graph's nodes emit.
         const event = chunk as StylistEvent;
         if (event.type === 'token') firstTokenMs ??= elapsed();
-        yield event.type === 'outfit'
-          ? { ...event, id: await this.save(userId, event) }
-          : event;
+        if (event.type === 'step') trace.steps.push(event.step);
+        if (event.type === 'outfit') {
+          trace.outfit = event.items.map((i) => i.name);
+          yield { ...event, id: await this.save(userId, event) };
+        } else {
+          yield event;
+        }
       }
-      yield { type: 'done', ms: elapsed(), firstTokenMs, consulted };
+      const traceId = await this.keep(userId, {
+        ...trace,
+        calls: recorder.calls,
+        failed: false,
+      });
+      yield { type: 'done', ms: elapsed(), firstTokenMs, consulted, traceId };
     } catch (error) {
       if (signal?.aborted) return;
       // Log what failed, never the conversation itself.
       this.logger.error(
         `Stylist run failed: ${error instanceof Error ? error.message : 'unknown error'}`,
       );
+      const traceId = await this.keep(userId, {
+        ...trace,
+        calls: recorder.calls,
+        failed: true,
+      });
       yield {
         type: 'error',
         message: 'The stylist could not answer just now. Please try again.',
+        traceId,
       };
+    }
+  }
+
+  /** Keeps the trace so the person can open this answer later. A failure costs the trace, not the reply. */
+  private async keep(userId: string, trace: NewTrace): Promise<string | null> {
+    try {
+      return await this.traces.save(userId, trace);
+    } catch (error) {
+      this.logger.error(
+        `Saving a trace failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+      );
+      return null;
     }
   }
 

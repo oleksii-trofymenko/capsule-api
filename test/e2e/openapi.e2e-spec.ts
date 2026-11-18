@@ -30,6 +30,7 @@ describe('OpenAPI contract', () => {
       '/v1/profile',
       '/v1/profile/quiz',
       '/v1/stylist/chat',
+      '/v1/stylist/traces/{id}',
       '/v1/wardrobe/items',
       '/v1/wardrobe/items/{id}',
     ]);

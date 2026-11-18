@@ -21,6 +21,7 @@ import {
 } from '../stylist/context.js';
 import type { Consulted } from '../stylist/stylist.schemas.js';
 import { StylistService } from '../stylist/stylist.service.js';
+import { TRACE_STORE, type TraceStore } from '../traces/trace-store.js';
 import { runEval, ruleResults, summarise, type Subject } from './evaluate.js';
 import { createJudge } from './judge.js';
 import { evalScenarios } from './scenarios.js';
@@ -32,6 +33,7 @@ const sampleContext: StylistContextSource = {
 
 /** Each scenario is a fresh conversation, so nothing it says is kept for the next. */
 const forgetNotes: NoteStore = { add: async () => {} };
+const forgetTraces: TraceStore = { save: async () => 'eval-trace' };
 
 /** Suggested outfits are kept in memory: the evaluation needs no database. */
 let saved = 0;
@@ -46,6 +48,7 @@ const memoryOutfits: OutfitStore = {
     { provide: STYLIST_CONTEXT, useValue: sampleContext },
     { provide: OUTFIT_STORE, useValue: memoryOutfits },
     { provide: NOTE_STORE, useValue: forgetNotes },
+    { provide: TRACE_STORE, useValue: forgetTraces },
   ],
 })
 class EvalModule {}

@@ -12,6 +12,7 @@ import {
   vector,
 } from 'drizzle-orm/pg-core';
 import { sql } from 'drizzle-orm';
+import type { NewTrace } from '../traces/traces.schemas.js';
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -321,3 +322,23 @@ export type WardrobeItemRow = typeof wardrobeItems.$inferSelect;
 export type StyleProfileRow = typeof styleProfiles.$inferSelect;
 export type OutfitRow = typeof outfits.$inferSelect;
 export type KnowledgePassageRow = typeof knowledgePassages.$inferSelect;
+
+/**
+ * What one stylist answer was made from: the prompts as each model received
+ * them and what it returned. Holds the conversation and wardrobe text, so it
+ * belongs to the person, is capped per person and goes when they forget.
+ */
+export const stylistTraces = pgTable(
+  'stylist_traces',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    body: jsonb('body').$type<NewTrace>().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index('stylist_traces_user_idx').on(t.userId, t.createdAt)],
+);

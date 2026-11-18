@@ -69,5 +69,7 @@ export type StylistEvent =
       ms: number;
       firstTokenMs: number | null;
       consulted: Consulted[];
+      /** Opens this answer's trace; null if it could not be kept. */
+      traceId: string | null;
     }
-  | { type: 'error'; message: string };
+  | { type: 'error'; message: string; traceId: string | null };
