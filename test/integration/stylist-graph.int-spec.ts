@@ -4,6 +4,7 @@ import { MetricsService } from '../../src/metrics/metrics.service.js';
 import { ModelRouter } from '../../src/models/model-router.service.js';
 import { readLibrary } from '../../src/occasions/load-occasions.js';
 import { OccasionsService } from '../../src/occasions/occasions.service.js';
+import type { NewNote } from '../../src/memory/memory.schemas.js';
 import type { NewOutfit } from '../../src/outfits/outfit-store.js';
 import { sampleWardrobe } from '../../src/playground/sample-data.js';
 import { stylistPrompts } from '../../src/stylist/stylist.prompts.js';
@@ -24,7 +25,7 @@ import {
 const occasions = new OccasionsService(readLibrary());
 const NOW = new Date('2026-11-17T12:00:00Z');
 
-function setup(script: ScriptStep[]) {
+function setup(script: ScriptStep[], notes: NewNote[] = []) {
   const model = new ScriptedChatModel(script);
   const router = new ModelRouter(
     parseEnv(TEST_ENV),
@@ -32,18 +33,20 @@ function setup(script: ScriptStep[]) {
     new MetricsService(),
   );
   const saved: NewOutfit[] = [];
+  const remembered: NewNote[] = [];
   const stylist = new StylistService(
     router,
     occasions,
-    { load: async () => ({ wardrobe: sampleWardrobe, profile: null }) },
+    { load: async () => ({ wardrobe: sampleWardrobe, profile: null, notes }) },
     {
       save: async (_userId, outfit) => {
         saved.push(outfit);
         return `outfit-${saved.length}`;
       },
     },
+    { add: async (_userId, added) => void remembered.push(...added) },
   );
-  return { model, stylist, saved };
+  return { model, stylist, saved, remembered };
 }
 
 async function run(stylist: StylistService, ...turns: string[]) {
@@ -178,9 +181,20 @@ describe('Stylist graph', () => {
     const stylist = new StylistService(
       router,
       occasions,
-      { load: async () => ({ wardrobe: sampleWardrobe, profile: null }) },
+      {
+        load: async () => ({
+          wardrobe: sampleWardrobe,
+          profile: null,
+          notes: [],
+        }),
+      },
       {
         save: async () => {
+          throw new Error('database down');
+        },
+      },
+      {
+        add: async () => {
           throw new Error('database down');
         },
       },
@@ -220,6 +234,59 @@ describe('Stylist graph', () => {
     expect(model.received).toHaveLength(1);
     expect(events.at(-1)).toMatchObject({ type: 'done', consulted: [] });
     expect(saved).toEqual([]);
+  });
+
+  it('keeps what the person says about themselves, and leaves out a dislike at once', async () => {
+    const { model, stylist, remembered } = setup([
+      [
+        toolCallChunk('understanding', {
+          intent: 'outfit',
+          enoughToSuggest: true,
+          remember: [
+            { kind: 'dislike', text: 'navy' },
+            { kind: 'like', text: 'x'.repeat(500) },
+            { kind: 'opinion', text: 'boots' },
+            { kind: 'fact', text: 'wears UK 12 in dresses' },
+          ],
+        }),
+      ],
+      picked(['w06', 'w01']),
+      textChunks('Trousers and shirt.'),
+    ]);
+    await run(stylist, 'I never wear navy. Something for the office?');
+
+    // Invalid notes from the model are dropped; the valid ones are kept.
+    expect(remembered).toEqual([
+      { kind: 'dislike', text: 'navy' },
+      { kind: 'fact', text: 'wears UK 12 in dresses' },
+    ]);
+    const compose = systemText(model.received[1]);
+    expect(compose).not.toContain('Navy wool blazer');
+    expect(compose).not.toContain('Navy merino');
+    expect(compose).toContain('Charcoal wool trousers');
+  });
+
+  it('remembers earlier conversations: notes reach the prompt and dislikes leave the candidates', async () => {
+    const { model, stylist, remembered } = setup(
+      [
+        understood('outfit'),
+        picked(['w06', 'w01']),
+        textChunks('Trousers and shirt.'),
+      ],
+      [
+        { kind: 'dislike', text: 'navy' },
+        { kind: 'like', text: 'earth tones' },
+      ],
+    );
+    await run(stylist, 'Something for the office?');
+
+    const compose = systemText(model.received[1]);
+    expect(compose).toContain(
+      'What the person told us in earlier conversations:\n- Dislikes: navy\n- Likes: earth tones',
+    );
+    expect(compose).not.toContain('Navy wool blazer');
+    expect(systemText(model.received[2])).toContain('Dislikes: navy');
+    expect(remembered).toEqual([]);
   });
 
   it('answers a question with the whole wardrobe in view, by name', async () => {

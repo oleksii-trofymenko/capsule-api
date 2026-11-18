@@ -19,6 +19,8 @@ describe('OpenAPI contract', () => {
       '/v1/auth/register',
       '/v1/health',
       '/v1/health/ready',
+      '/v1/memory',
+      '/v1/memory/{id}',
       '/v1/models',
       '/v1/outfits/{id}/feedback',
       '/v1/photos',

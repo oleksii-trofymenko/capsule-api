@@ -1,5 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { Locale } from '../locale.js';
+import { MemoryService } from '../memory/memory.service.js';
+import { NOTE_STORE, type NoteStore } from '../memory/note-store.js';
 import { ModelRouter } from '../models/model-router.service.js';
 import { OccasionsService } from '../occasions/occasions.service.js';
 import { ProfileService } from '../profile/profile.service.js';
@@ -26,14 +28,20 @@ export class DbContextSource implements StylistContextSource {
   constructor(
     @Inject(WardrobeService) private readonly wardrobe: WardrobeService,
     @Inject(ProfileService) private readonly profiles: ProfileService,
+    @Inject(MemoryService) private readonly memory: MemoryService,
   ) {}
 
   async load(userId: string): Promise<StylistContext> {
-    const [wardrobe, profile] = await Promise.all([
+    const [wardrobe, profile, notes] = await Promise.all([
       this.wardrobe.list(userId),
       this.profiles.answers(userId),
+      this.memory.list(userId),
     ]);
-    return { wardrobe, profile };
+    return {
+      wardrobe,
+      profile,
+      notes: notes.map(({ kind, text }) => ({ kind, text })),
+    };
   }
 }
 
@@ -47,11 +55,13 @@ export class StylistService {
     @Inject(OccasionsService) occasions: OccasionsService,
     @Inject(STYLIST_CONTEXT) context: StylistContextSource,
     @Inject(OUTFIT_STORE) private readonly outfits: OutfitStore,
+    @Inject(NOTE_STORE) notes: NoteStore,
   ) {
     this.graph = buildStylistGraph({
       models,
       occasions,
       context,
+      notes,
       logger: this.logger,
     });
   }

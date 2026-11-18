@@ -44,7 +44,7 @@ describe('filterCandidates', () => {
   const wardrobe = [shirt, jumper, trainers, pumps];
 
   it('keeps everything when there is no occasion and no dislikes', () => {
-    expect(filterCandidates(wardrobe, [], [])).toEqual(wardrobe);
+    expect(filterCandidates(wardrobe, [], [], [])).toEqual(wardrobe);
   });
 
   it("removes items the occasion's rules forbid, item by item", () => {
@@ -52,7 +52,7 @@ describe('filterCandidates', () => {
       { id: 'smart', type: 'minFormality', level: 'smart' },
       { id: 'no-trainers', type: 'forbidItems', words: ['trainer'] },
     ];
-    expect(filterCandidates(wardrobe, rules, [])).toEqual([
+    expect(filterCandidates(wardrobe, rules, [], [])).toEqual([
       shirt,
       jumper,
       pumps,
@@ -63,13 +63,38 @@ describe('filterCandidates', () => {
     const rules: Rule[] = [
       { id: 'no-white', type: 'forbidMainColour', colours: ['white'] },
     ];
-    expect(filterCandidates(wardrobe, rules, [])).toEqual(wardrobe);
+    expect(filterCandidates(wardrobe, rules, [], [])).toEqual(wardrobe);
   });
 
   it('removes what the person said they never wear', () => {
-    expect(filterCandidates(wardrobe, [], ['high-necklines', 'heels'])).toEqual(
-      [shirt, trainers],
+    expect(
+      filterCandidates(wardrobe, [], ['high-necklines', 'heels'], []),
+    ).toEqual([shirt, trainers]);
+  });
+
+  it('removes items whose name or colour holds a disliked phrase, whole words only', () => {
+    const mustard = item(
+      'w20',
+      'Ribbed knit top',
+      'top',
+      'Mustard yellow',
+      'casual',
     );
+    const print = item(
+      'w21',
+      'Yellowstone print tee',
+      'top',
+      'green',
+      'casual',
+    );
+    expect(
+      filterCandidates(
+        [...wardrobe, mustard, print],
+        [],
+        [],
+        ['yellow', 'turtlenecks', ' '],
+      ),
+    ).toEqual([shirt, trainers, pumps, print]);
   });
 });
 

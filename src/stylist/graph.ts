@@ -24,7 +24,10 @@ import type {
   StylistItem,
 } from './context.js';
 import { stylistPrompts } from './stylist.prompts.js';
+import type { NewNote } from '../memory/memory.schemas.js';
+import type { NoteStore } from '../memory/note-store.js';
 import {
+  notesToKeep,
   outfitPickSchema,
   understandingSchema,
   type ChatMessage,
@@ -37,7 +40,19 @@ export interface GraphDeps {
   models: ModelRouter;
   occasions: OccasionsService;
   context: StylistContextSource;
+  notes: NoteStore;
   logger: Pick<Logger, 'warn'>;
+}
+
+/** Keeps what the person said about themselves. A failure costs the note, not the reply. */
+async function remember(deps: GraphDeps, userId: string, notes: NewNote[]) {
+  try {
+    await deps.notes.add(userId, notes);
+  } catch (error) {
+    deps.logger.warn(
+      `Saving notes failed: ${error instanceof Error ? error.message : 'unknown error'}`,
+    );
+  }
 }
 
 interface Outfit {
@@ -56,7 +71,7 @@ const State = Annotation.Root({
   locale: Annotation<Locale>,
   now: Annotation<Date>,
   messages: Annotation<ChatMessage[]>,
-  context: latest<StylistContext>({ wardrobe: [], profile: null }),
+  context: latest<StylistContext>({ wardrobe: [], profile: null, notes: [] }),
   occasion: latest<Occasion | null>(null),
   understanding: latest<Understanding | null>(null),
   candidates: latest<StylistItem[]>([]),
@@ -105,6 +120,12 @@ function situation(s: GraphState): string[] {
         `loves ${p.favouriteColours.join(', ') || '-'}; avoids ${p.avoidColours.join(', ') || '-'}; ` +
         `never wears ${p.neverWear.join(', ') || '-'}; week ${p.lifestyle}.`,
     );
+  }
+  if (s.context.notes.length > 0) {
+    const lines = s.context.notes.map(
+      (n) => `${l.noteKinds[n.kind]}: ${n.text}`,
+    );
+    blocks.push(`${l.notes}:\n- ${lines.join('\n- ')}`);
   }
   return blocks;
 }
@@ -196,11 +217,17 @@ export function buildStylistGraph(deps: GraphDeps) {
           .invoke(prompt([stylistPrompts[s.locale].understand], s), {
             signal: config.signal,
           });
-        return { understanding: understandingSchema.parse(raw) };
+        const understanding = understandingSchema.parse(raw);
+        await remember(deps, s.userId, notesToKeep(understanding.remember));
+        return { understanding };
       } catch {
         // Answering is the safe fallback: it never invents an outfit.
         return {
-          understanding: { intent: 'question', enoughToSuggest: true } as const,
+          understanding: {
+            intent: 'question',
+            enoughToSuggest: true,
+            remember: [],
+          } as const,
         };
       }
     })
@@ -215,6 +242,11 @@ export function buildStylistGraph(deps: GraphDeps) {
         s.context.wardrobe,
         s.occasion?.rules ?? [],
         s.context.profile?.neverWear ?? [],
+        // Dislikes from earlier conversations and from this message.
+        [
+          ...s.context.notes,
+          ...notesToKeep(s.understanding?.remember ?? []),
+        ].flatMap((n) => (n.kind === 'dislike' ? [n.text] : [])),
       );
       return { candidates, consulted: ['wardrobe'] };
     })

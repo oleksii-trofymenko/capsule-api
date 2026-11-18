@@ -1,4 +1,7 @@
+import type { NOTE_KINDS } from '../db/schema.js';
 import type { Locale } from '../locale.js';
+
+type NoteKind = (typeof NOTE_KINDS)[number];
 
 export interface StylistPrompts {
   /** Classifies the latest message; the occasion itself is found in code. */
@@ -21,6 +24,8 @@ export interface StylistPrompts {
     wardrobe: string;
     emptyWardrobe: string;
     profile: string;
+    notes: string;
+    noteKinds: Record<NoteKind, string>;
     outfit: string;
     missing: string;
     removed: string;
@@ -33,7 +38,8 @@ export const stylistPrompts: Record<Locale, StylistPrompts> = {
   en: {
     understand: `You read the latest message to a personal stylist and classify it.
 - intent: "outfit" if the person wants clothes put together (an outfit, a look, what to wear somewhere, something to wear instead of a piece). "question" for anything else: whether something works, what they own, buying or replacing a single piece, trends, sizes, or a remark.
-- enoughToSuggest: for an outfit, true if the conversation gives anything to go on: where they are going, what they are doing, the weather, a style such as smart-casual, or items to build around or replace. False only if it gives nothing at all, as in "I'm going out" or "what should I wear today?".`,
+- enoughToSuggest: for an outfit, true if the conversation gives anything to go on: where they are going, what they are doing, the weather, a style such as smart-casual, or items to build around or replace. False only if it gives nothing at all, as in "I'm going out" or "what should I wear today?".
+- remember: what the latest message says about the person's own lasting taste, sizes or fit, to keep for later conversations. Each has a kind ("like", "dislike" or "fact") and a short text naming the thing itself, such as "yellow", "turtlenecks" or "wears UK 12 in dresses". Usually empty. Nothing about other people, one-off plans or the occasion.`,
     compose: `You put together one outfit from the candidate items listed, for the conversation below.
 - Use only ids from the candidate list. Choose 2 to 5 items that work together: usually a top or dress, a bottom unless there is a dress, shoes, and outerwear if the weather or occasion calls for it.
 - Follow the occasion's guidance and rules if one is given, the season, and anything the person said they want or dislike.
@@ -51,6 +57,8 @@ export const stylistPrompts: Record<Locale, StylistPrompts> = {
       wardrobe: 'Everything the person owns',
       emptyWardrobe: 'The wardrobe is empty so far.',
       profile: 'What the person told us about themselves',
+      notes: 'What the person told us in earlier conversations',
+      noteKinds: { like: 'Likes', dislike: 'Dislikes', fact: 'Fact' },
       outfit: 'The outfit',
       missing: 'Missing',
       removed: 'Removed for breaking a rule',
