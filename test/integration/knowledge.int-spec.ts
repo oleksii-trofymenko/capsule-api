@@ -123,6 +123,7 @@ describe('KnowledgeService', () => {
     await db.insert(knowledgePassages).values({
       sourceId,
       text: PASSAGES.wedding,
+      textHash: 'not-checked-here',
       publishedOn: '2026-01-01',
       embedding,
       embeddingModel: 'other:model',
@@ -157,6 +158,96 @@ describe('KnowledgeService', () => {
       'The embedding model ollama:nomic-embed-text returns 5 numbers, but the knowledge base stores 768',
     );
     await close();
+  });
+
+  describe('addDocument', () => {
+    const SOURCE = {
+      name: 'Capsule test guide',
+      url: null,
+      licence: 'CC BY 4.0',
+    };
+    // Three paragraphs too long to share a passage, so the document becomes three passages.
+    const DOCUMENT = Object.values(PASSAGES)
+      .slice(0, 3)
+      .map((p) => `${p} `.repeat(12))
+      .join('\n\n');
+    const add = (knowledge: KnowledgeService) =>
+      knowledge.addDocument({
+        source: SOURCE,
+        text: DOCUMENT,
+        publishedOn: '2026-03-01',
+      });
+
+    it('adds a document once: running it again changes nothing and calls no model', async () => {
+      const embedder = new KeywordEmbeddings();
+      const { db, close, knowledge } = await setup(embedder);
+
+      const first = await add(knowledge);
+      const embed = vi.spyOn(embedder, 'embedDocuments');
+      const second = await add(knowledge);
+
+      expect(first).toMatchObject({ added: 3, skipped: 0 });
+      expect(second).toEqual({ ...first, added: 0, skipped: 3 });
+      expect(embed).not.toHaveBeenCalled();
+      expect(
+        await db
+          .select()
+          .from(knowledgeSources)
+          .where(eq(knowledgeSources.name, SOURCE.name)),
+      ).toHaveLength(1);
+      const passages = await db
+        .select()
+        .from(knowledgePassages)
+        .where(eq(knowledgePassages.sourceId, first.sourceId));
+      expect(passages).toHaveLength(3);
+      expect(passages.every((p) => p.publishedOn === '2026-03-01')).toBe(true);
+      expect(
+        (await knowledge.search('linen summer', { now: NOW }))[0],
+      ).toMatchObject({
+        source: { name: SOURCE.name, licence: SOURCE.licence },
+      });
+      await close();
+    });
+
+    it('finishes a document that failed part-way without duplicating the first part', async () => {
+      const embedder = new KeywordEmbeddings();
+      const { db, close, knowledge } = await setup(embedder);
+      const real = embedder.embedDocuments.bind(embedder);
+      vi.spyOn(embedder, 'embedDocuments')
+        .mockImplementationOnce(real)
+        .mockRejectedValueOnce(new Error('model went away'));
+
+      await expect(add(knowledge)).rejects.toThrow('model went away');
+      const rerun = await add(knowledge);
+
+      expect(rerun).toMatchObject({ added: 2, skipped: 1 });
+      expect(
+        await db
+          .select()
+          .from(knowledgePassages)
+          .where(eq(knowledgePassages.sourceId, rerun.sourceId)),
+      ).toHaveLength(3);
+      await close();
+    });
+
+    it('refuses a known source under a different licence', async () => {
+      const { db, close, knowledge } = await setup();
+      await add(knowledge);
+
+      await expect(
+        knowledge.addDocument({
+          source: { ...SOURCE, licence: 'All rights reserved' },
+          text: 'Something new.',
+          publishedOn: '2026-03-01',
+        }),
+      ).rejects.toThrow('already recorded with the licence "CC BY 4.0"');
+      const [source] = await db
+        .select()
+        .from(knowledgeSources)
+        .where(eq(knowledgeSources.name, SOURCE.name));
+      expect(source.licence).toBe('CC BY 4.0');
+      await close();
+    });
   });
 
   it('removes a source together with its passages', async () => {
