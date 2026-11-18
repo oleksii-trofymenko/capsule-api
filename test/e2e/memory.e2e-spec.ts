@@ -134,7 +134,7 @@ describe('Personal memory', () => {
     );
     await chat(
       ana,
-      'Green is my colour.',
+      'Green is my favourite colour.',
       [{ kind: 'like', text: 'green' }],
       [trousers],
     );
@@ -153,7 +153,7 @@ describe('Personal memory', () => {
     const trousers = await addItem(ana, 'Grey wool trousers', 'grey');
     await chat(
       ana,
-      'No navy, please.',
+      'I never wear navy.',
       [{ kind: 'dislike', text: 'navy' }],
       [trousers],
     );

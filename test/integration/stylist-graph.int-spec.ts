@@ -266,6 +266,30 @@ describe('Stylist graph', () => {
     expect(compose).toContain('Charcoal wool trousers');
   });
 
+  it('keeps nothing from a one-off reaction, even when the model notes it', async () => {
+    const { model, stylist, remembered } = setup([
+      [
+        toolCallChunk('understanding', {
+          intent: 'outfit',
+          enoughToSuggest: true,
+          remember: [{ kind: 'dislike', text: 'blazers' }],
+        }),
+      ],
+      picked(['w02', 'w06']),
+      textChunks('Jumper and trousers.'),
+    ]);
+    await run(
+      stylist,
+      'Something smart for Friday drinks?',
+      'Navy wool blazer, white cotton shirt and charcoal wool trousers.',
+      'That felt too stiff. It was the blazer.',
+    );
+
+    expect(remembered).toEqual([]);
+    // Within this conversation the model handles the blazer; code bans nothing.
+    expect(systemText(model.received[1])).toContain('Navy wool blazer');
+  });
+
   it('remembers earlier conversations: notes reach the prompt and dislikes leave the candidates', async () => {
     const { model, stylist, remembered } = setup(
       [

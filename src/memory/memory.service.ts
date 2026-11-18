@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { DB, type Db } from '../db/db.module.js';
 import { personalNotes } from '../db/schema.js';
 import type { NewNote, Note } from './memory.schemas.js';
@@ -27,13 +27,29 @@ export class MemoryService implements NoteStore {
     }));
   }
 
-  /** Keeps new notes, skipping ones already known in any letter case, then trims to MAX_NOTES. */
+  /**
+   * Keeps new notes. The latest word on a thing wins, in any letter case: "I
+   * love navy" replaces an earlier navy dislike. Then trims to MAX_NOTES.
+   */
   async add(userId: string, notes: NewNote[]): Promise<void> {
-    if (notes.length === 0) return;
-    await this.db
-      .insert(personalNotes)
-      .values(notes.map((n) => ({ userId, ...n })))
-      .onConflictDoNothing();
+    const latest = [
+      ...new Map(notes.map((n) => [n.text.toLowerCase(), n])).values(),
+    ];
+    if (latest.length === 0) return;
+    await this.db.transaction(async (tx) => {
+      await tx.delete(personalNotes).where(
+        and(
+          eq(personalNotes.userId, userId),
+          inArray(
+            sql`lower(${personalNotes.text})`,
+            latest.map((n) => n.text.toLowerCase()),
+          ),
+        ),
+      );
+      await tx
+        .insert(personalNotes)
+        .values(latest.map((n) => ({ userId, ...n })));
+    });
     const overflow = (await this.list(userId)).slice(MAX_NOTES);
     if (overflow.length > 0) {
       await this.db.delete(personalNotes).where(

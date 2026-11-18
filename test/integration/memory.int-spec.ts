@@ -39,6 +39,20 @@ describe('MemoryService', () => {
     await close();
   });
 
+  it('lets a change of mind win: a later note replaces an earlier one about the same thing', async () => {
+    const { close, memory, userId } = await setup();
+    await memory.add(userId, [{ kind: 'dislike', text: 'navy' }]);
+    await memory.add(userId, [
+      { kind: 'dislike', text: 'Navy' },
+      { kind: 'like', text: 'Navy' },
+    ]);
+
+    expect(await memory.list(userId)).toMatchObject([
+      { kind: 'like', text: 'Navy' },
+    ]);
+    await close();
+  });
+
   it("removes a user's notes when the user is deleted", async () => {
     const { db, close, memory, userId } = await setup();
     await memory.add(userId, [{ kind: 'fact', text: 'wears UK 12' }]);

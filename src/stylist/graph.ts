@@ -26,8 +26,8 @@ import type {
 import { stylistPrompts } from './stylist.prompts.js';
 import type { NewNote } from '../memory/memory.schemas.js';
 import type { NoteStore } from '../memory/note-store.js';
+import { notesToKeep } from './notes.js';
 import {
-  notesToKeep,
   outfitPickSchema,
   understandingSchema,
   type ChatMessage,
@@ -74,6 +74,8 @@ const State = Annotation.Root({
   context: latest<StylistContext>({ wardrobe: [], profile: null, notes: [] }),
   occasion: latest<Occasion | null>(null),
   understanding: latest<Understanding | null>(null),
+  /** Notes kept from the latest message. */
+  remembered: latest<NewNote[]>([]),
   candidates: latest<StylistItem[]>([]),
   outfit: latest<Outfit | null>(null),
   consulted: Annotation<Consulted[]>({
@@ -218,8 +220,14 @@ export function buildStylistGraph(deps: GraphDeps) {
             signal: config.signal,
           });
         const understanding = understandingSchema.parse(raw);
-        await remember(deps, s.userId, notesToKeep(understanding.remember));
-        return { understanding };
+        const latestMessage = s.messages.at(-1)?.content ?? '';
+        const remembered = notesToKeep(
+          understanding.remember,
+          latestMessage,
+          stylistPrompts[s.locale].lastingWords,
+        );
+        await remember(deps, s.userId, remembered);
+        return { understanding, remembered };
       } catch {
         // Answering is the safe fallback: it never invents an outfit.
         return {
@@ -243,10 +251,9 @@ export function buildStylistGraph(deps: GraphDeps) {
         s.occasion?.rules ?? [],
         s.context.profile?.neverWear ?? [],
         // Dislikes from earlier conversations and from this message.
-        [
-          ...s.context.notes,
-          ...notesToKeep(s.understanding?.remember ?? []),
-        ].flatMap((n) => (n.kind === 'dislike' ? [n.text] : [])),
+        [...s.context.notes, ...s.remembered].flatMap((n) =>
+          n.kind === 'dislike' ? [n.text] : [],
+        ),
       );
       return { candidates, consulted: ['wardrobe'] };
     })

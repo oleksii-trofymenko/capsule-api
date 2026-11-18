@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { newNoteSchema, type NewNote } from '../memory/memory.schemas.js';
 
 export const stylistChatSchema = z.object({
   messages: z
@@ -24,20 +23,11 @@ export type ChatMessage = StylistChatRequest['messages'][number];
 export const understandingSchema = z.object({
   intent: z.enum(['outfit', 'question']),
   enoughToSuggest: z.boolean(),
-  // Loose here so one bad note cannot spoil the classification; each is checked with notesToKeep.
+  // Loose here so one bad note cannot spoil the classification; each is checked in notes.ts.
   remember: z
     .array(z.object({ kind: z.string(), text: z.string() }))
     .default([]),
 });
-
-/** The notes worth storing from one message: valid ones only, at most three. */
-export const notesToKeep = (remember: Understanding['remember']): NewNote[] =>
-  remember
-    .flatMap((n) => {
-      const note = newNoteSchema.safeParse(n);
-      return note.success ? [note.data] : [];
-    })
-    .slice(0, 3);
 
 /** The compose step's structured output: ids only, checked against the candidates in code. */
 export const outfitPickSchema = z.object({
