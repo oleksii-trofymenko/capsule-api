@@ -5,6 +5,7 @@ import { ENV } from '../config/config.module.js';
 import type { Env } from '../config/env.js';
 import { MetricsService } from '../metrics/metrics.service.js';
 import { LlmMetricsCallback } from './llm-metrics.callback.js';
+import { MeasuredEmbeddings } from './measured-embeddings.js';
 import {
   MODEL_TASKS,
   parseModelSpec,
@@ -61,8 +62,10 @@ export class ModelRouter {
 
   embeddings(): Embeddings {
     const spec = this.routes.embedding;
-    this.embeddingModel ??= this.providerFor('embedding').embeddings(
-      spec.model,
+    this.embeddingModel ??= new MeasuredEmbeddings(
+      this.providerFor('embedding').embeddings(spec.model),
+      this.metrics,
+      { task: 'embedding', ...spec },
     );
     return this.embeddingModel;
   }

@@ -64,6 +64,26 @@ describe('ModelRouter', () => {
     expect(text).not.toContain('task="vision"');
   });
 
+  it('records embedding calls too, labelled as the embedding task', async () => {
+    const metrics = new MetricsService();
+    const router = new ModelRouter(
+      parseEnv(TEST_ENV),
+      [new FakeProvider()],
+      metrics,
+    );
+
+    await router.embeddings().embedQuery('navy blazer');
+    await router.embeddings().embedDocuments(['grey trousers', 'brogues']);
+
+    const text = await metrics.registry.metrics();
+    expect(text).toContain(
+      'llm_requests_total{task="embedding",provider="ollama",model="nomic-embed-text",outcome="success"} 2',
+    );
+    expect(text).toMatch(
+      /llm_request_duration_seconds_count\{[^}]*task="embedding"[^}]*outcome="success"[^}]*\} 2/,
+    );
+  });
+
   it('reports provider health once per provider in use', async () => {
     const router = new ModelRouter(
       parseEnv(TEST_ENV),
