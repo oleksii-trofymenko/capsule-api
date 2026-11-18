@@ -1,5 +1,5 @@
 {
-  "id": "c7c208e6-d7d7-4c58-81c2-eefd653059b1",
+  "id": "d291c793-7daa-4831-99ef-4fa052cb1e61",
   "prevId": "6306cbd8-c2c5-4396-aa16-57a23404b2d8",
   "version": "7",
   "dialect": "postgresql",
@@ -23,6 +23,12 @@
         },
         "text": {
           "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text_hash": {
+          "name": "text_hash",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -61,17 +67,29 @@
         }
       },
       "indexes": {
-        "knowledge_passages_source_idx": {
-          "name": "knowledge_passages_source_idx",
+        "knowledge_passages_source_text_idx": {
+          "name": "knowledge_passages_source_text_idx",
           "columns": [
             {
               "expression": "source_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
+            },
+            {
+              "expression": "text_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "published_on",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
             }
           ],
-          "isUnique": false,
+          "isUnique": true,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -154,7 +172,15 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "knowledge_sources_name_unique": {
+          "name": "knowledge_sources_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -242,87 +268,6 @@
         "outfits_user_id_users_id_fk": {
           "name": "outfits_user_id_users_id_fk",
           "tableFrom": "outfits",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.personal_notes": {
-      "name": "personal_notes",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "kind": {
-          "name": "kind",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "text": {
-          "name": "text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "personal_notes_user_text_idx": {
-          "name": "personal_notes_user_text_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "lower(\"text\")",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "personal_notes_user_id_users_id_fk": {
-          "name": "personal_notes_user_id_users_id_fk",
-          "tableFrom": "personal_notes",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"

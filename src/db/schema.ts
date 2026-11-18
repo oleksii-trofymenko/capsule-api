@@ -237,7 +237,8 @@ export const EMBEDDING_DIMENSIONS = 768;
 /** Where knowledge comes from. Only sources listed in docs/SOURCES.md may be ingested (T15). */
 export const knowledgeSources = pgTable('knowledge_sources', {
   id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').notNull(),
+  /** Unique, so ingesting the same source again finds it instead of adding a second one. */
+  name: text('name').notNull().unique(),
   /** Null for sources with no address, such as a book. */
   url: text('url'),
   licence: text('licence').notNull(),
@@ -255,6 +256,8 @@ export const knowledgePassages = pgTable(
       .notNull()
       .references(() => knowledgeSources.id, { onDelete: 'cascade' }),
     text: text('text').notNull(),
+    /** SHA-256 of the text: re-ingesting a document skips passages it already has. */
+    textHash: text('text_hash').notNull(),
     /** When the source published it: retrieval prefers recent passages. */
     publishedOn: date('published_on', { mode: 'string' }).notNull(),
     /** Trend records name the seasons they apply to; empty means any season. */
@@ -269,7 +272,12 @@ export const knowledgePassages = pgTable(
       .defaultNow(),
   },
   (t) => [
-    index('knowledge_passages_source_idx').on(t.sourceId),
+    // The same text published again later is a new passage; the same document ingested twice is not.
+    uniqueIndex('knowledge_passages_source_text_idx').on(
+      t.sourceId,
+      t.textHash,
+      t.publishedOn,
+    ),
     index('knowledge_passages_embedding_idx').using(
       'hnsw',
       t.embedding.op('vector_cosine_ops'),

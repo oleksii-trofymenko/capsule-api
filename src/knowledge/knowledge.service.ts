@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, cosineDistance, eq, sql } from 'drizzle-orm';
+import { createHash } from 'node:crypto';
 import { DB, type Db } from '../db/db.module.js';
 import {
   EMBEDDING_DIMENSIONS,
@@ -8,11 +9,12 @@ import {
   type SEASONS,
 } from '../db/schema.js';
 import { ModelRouter } from '../models/model-router.service.js';
+import { chunk } from './chunk.js';
 import { rank } from './rank.js';
 
 type Season = (typeof SEASONS)[number];
 
-/** The embedding model reads only so much; longer text must be split before it gets here (T17). */
+/** The embedding model reads only so much; addDocument splits longer text (see chunk.ts). */
 export const MAX_PASSAGE_CHARS = 2000;
 
 export interface NewSource {
@@ -50,36 +52,89 @@ export class KnowledgeService {
     @Inject(ModelRouter) private readonly models: ModelRouter,
   ) {}
 
+  /**
+   * The source with this name, added if it is new. A known name with a
+   * different licence is refused: which licence holds is a person's decision.
+   */
   async addSource(source: NewSource): Promise<string> {
-    const [row] = await this.db
+    await this.db
       .insert(knowledgeSources)
       .values(source)
-      .returning({ id: knowledgeSources.id });
+      .onConflictDoNothing({ target: knowledgeSources.name });
+    const [row] = await this.db
+      .select({ id: knowledgeSources.id, licence: knowledgeSources.licence })
+      .from(knowledgeSources)
+      .where(eq(knowledgeSources.name, source.name));
+    if (row.licence !== source.licence) {
+      throw new Error(
+        `The source "${source.name}" is already recorded with the licence "${row.licence}", not "${source.licence}"`,
+      );
+    }
     return row.id;
   }
 
   async addPassage(passage: NewPassage): Promise<string> {
+    return (await this.store(passage)).id;
+  }
+
+  /**
+   * Splits a document into passages and adds the ones the source does not
+   * have yet. Re-running it, also after a failure part-way, adds only what is missing.
+   */
+  async addDocument(
+    document: Omit<NewPassage, 'sourceId'> & { source: NewSource },
+  ): Promise<{ sourceId: string; added: number; skipped: number }> {
+    const sourceId = await this.addSource(document.source);
+    const passages = chunk(document.text);
+    let added = 0;
+    for (const text of passages) {
+      const stored = await this.store({ ...document, sourceId, text });
+      if (stored.added) added += 1;
+    }
+    return { sourceId, added, skipped: passages.length - added };
+  }
+
+  /** Embeds and inserts a passage, unless the source already has it: then no model call is made. */
+  private async store(
+    passage: NewPassage,
+  ): Promise<{ id: string; added: boolean }> {
     const text = passage.text.trim();
     if (text.length === 0 || text.length > MAX_PASSAGE_CHARS) {
       throw new RangeError(
         `A passage must have 1 to ${MAX_PASSAGE_CHARS} characters; this one has ${text.length}`,
       );
     }
+    const key = {
+      sourceId: passage.sourceId,
+      textHash: createHash('sha256').update(text).digest('hex'),
+      publishedOn: passage.publishedOn,
+    };
+    const [existing] = await this.db
+      .select({ id: knowledgePassages.id })
+      .from(knowledgePassages)
+      .where(
+        and(
+          eq(knowledgePassages.sourceId, key.sourceId),
+          eq(knowledgePassages.textHash, key.textHash),
+          eq(knowledgePassages.publishedOn, key.publishedOn),
+        ),
+      );
+    if (existing) return { id: existing.id, added: false };
+
     const embedding = this.checked(
       await this.models.embeddings().embedDocuments([text]),
     )[0];
     const [row] = await this.db
       .insert(knowledgePassages)
       .values({
-        sourceId: passage.sourceId,
+        ...key,
         text,
-        publishedOn: passage.publishedOn,
         seasons: passage.seasons ?? [],
         embedding,
         embeddingModel: this.modelName(),
       })
       .returning({ id: knowledgePassages.id });
-    return row.id;
+    return { id: row.id, added: true };
   }
 
   /**
