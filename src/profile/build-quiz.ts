@@ -1,8 +1,13 @@
 import {
+  COLOUR_CONTRASTS,
   COLOUR_FAMILIES,
+  COLOUR_TEMPERATURES,
   FITS,
+  FRAME_NOTES,
+  HEIGHTS,
   LIFESTYLES,
   NEVER_WEAR,
+  PLAY_UP,
   SIZE_SYSTEMS,
   STYLE_DIRECTIONS,
 } from '../db/schema.js';
@@ -63,6 +68,18 @@ export function buildQuiz(locale: Locale): Quiz {
         options: colours,
       },
       {
+        id: 'colourTemperature',
+        type: 'single',
+        question: t.colourTemperature.question,
+        options: options(COLOUR_TEMPERATURES, t.colourTemperature.options),
+      },
+      {
+        id: 'colourContrast',
+        type: 'single',
+        question: t.colourContrast.question,
+        options: options(COLOUR_CONTRASTS, t.colourContrast.options),
+      },
+      {
         id: 'lifestyle',
         type: 'single',
         question: t.lifestyle.question,
@@ -75,6 +92,28 @@ export function buildQuiz(locale: Locale): Quiz {
         hint: t.neverWear.hint,
         max: NEVER_WEAR.length,
         options: options(NEVER_WEAR, t.neverWear.options),
+      },
+      {
+        id: 'height',
+        type: 'single',
+        question: t.height.question,
+        options: options(HEIGHTS, t.height.options),
+      },
+      {
+        id: 'frame',
+        type: 'multi',
+        question: t.frame.question,
+        hint: t.frame.hint,
+        max: 3,
+        options: options(FRAME_NOTES, t.frame.options),
+      },
+      {
+        id: 'playUp',
+        type: 'multi',
+        question: t.playUp.question,
+        hint: t.playUp.hint,
+        max: 2,
+        options: options(PLAY_UP, t.playUp.options),
       },
     ],
   };

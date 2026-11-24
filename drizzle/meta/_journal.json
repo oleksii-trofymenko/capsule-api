@@ -71,6 +71,13 @@
       "when": 1795017139933,
       "tag": "0009_stylist-traces",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795542678379,
+      "tag": "0010_quiz-colouring-frame",
+      "breakpoints": true
     }
   ]
 }

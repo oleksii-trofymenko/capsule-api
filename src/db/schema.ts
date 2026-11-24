@@ -165,6 +165,25 @@ export const NEVER_WEAR = [
   'logos',
   'bold-patterns',
 ] as const;
+/** Self-described, never read from a photo. "skip" means not sure or would rather not say. */
+export const COLOUR_TEMPERATURES = ['warm', 'cool', 'neutral', 'skip'] as const;
+export const COLOUR_CONTRASTS = ['high', 'medium', 'low', 'skip'] as const;
+export const HEIGHTS = ['petite', 'average', 'tall', 'skip'] as const;
+export const FRAME_NOTES = [
+  'longer-torso',
+  'longer-legs',
+  'broader-shoulders',
+  'fuller-hips',
+  'defined-waist',
+  'straight-frame',
+] as const;
+export const PLAY_UP = [
+  'waist',
+  'legs',
+  'shoulders',
+  'neckline',
+  'arms',
+] as const;
 
 export interface Size {
   system: (typeof SIZE_SYSTEMS)[number];
@@ -193,6 +212,15 @@ export const styleProfiles = pgTable('style_profiles', {
     .notNull(),
   lifestyle: text('lifestyle', { enum: LIFESTYLES }).notNull(),
   neverWear: text('never_wear', { enum: NEVER_WEAR }).array().notNull(),
+  colourTemperature: text('colour_temperature', { enum: COLOUR_TEMPERATURES })
+    .notNull()
+    .default('skip'),
+  colourContrast: text('colour_contrast', { enum: COLOUR_CONTRASTS })
+    .notNull()
+    .default('skip'),
+  height: text('height', { enum: HEIGHTS }).notNull().default('skip'),
+  frame: text('frame', { enum: FRAME_NOTES }).array().notNull().default([]),
+  playUp: text('play_up', { enum: PLAY_UP }).array().notNull().default([]),
   createdAt: timestamp('created_at', { withTimezone: true })
     .notNull()
     .defaultNow(),

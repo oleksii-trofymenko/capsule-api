@@ -17,6 +17,11 @@ const toProfile = (row: StyleProfileRow) => ({
   avoidColours: row.avoidColours,
   lifestyle: row.lifestyle,
   neverWear: row.neverWear,
+  colourTemperature: row.colourTemperature,
+  colourContrast: row.colourContrast,
+  height: row.height,
+  frame: row.frame,
+  playUp: row.playUp,
   updatedAt: row.updatedAt.toISOString(),
 });
 

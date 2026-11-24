@@ -26,6 +26,8 @@ export interface StylistPrompts {
     wardrobe: string;
     emptyWardrobe: string;
     profile: string;
+    /** Follows the colouring and frame the person described, if any. */
+    selfUse: string;
     notes: string;
     noteKinds: Record<NoteKind, string>;
     outfit: string;
@@ -77,6 +79,8 @@ export const stylistPrompts: Record<Locale, StylistPrompts> = {
       wardrobe: 'Everything the person owns',
       emptyWardrobe: 'The wardrobe is empty so far.',
       profile: 'What the person told us about themselves',
+      selfUse:
+        'Use this quietly to choose colours near the face and proportions; mention the body only if they ask.',
       notes: 'What the person told us in earlier conversations',
       noteKinds: { like: 'Likes', dislike: 'Dislikes', fact: 'Fact' },
       outfit: 'The outfit',
