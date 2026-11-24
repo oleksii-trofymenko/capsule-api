@@ -184,6 +184,10 @@ describe('Profile API', () => {
       },
     ],
     [
+      'frame notes that contradict each other',
+      { ...answers, frame: ['broader-shoulders', 'fuller-hips'] },
+    ],
+    [
       'three things to show off',
       { ...answers, playUp: ['waist', 'legs', 'arms'] },
     ],

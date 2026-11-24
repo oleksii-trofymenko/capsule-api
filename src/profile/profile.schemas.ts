@@ -20,6 +20,12 @@ const choices = <T extends readonly [string, ...string[]]>(codes: T) =>
     .max(codes.length)
     .refine((a) => new Set(a).size === a.length, 'choices must not repeat');
 
+const OPPOSITE_FRAME_NOTES = [
+  ['longer-torso', 'longer-legs'],
+  ['broader-shoulders', 'fuller-hips'],
+  ['defined-waist', 'straight-frame'],
+] as const;
+
 export const profileAnswersSchema = z
   .object({
     sizes: z.object({
@@ -45,7 +51,14 @@ export const profileAnswersSchema = z
   .refine((a) => !a.avoidColours.some((c) => a.favouriteColours.includes(c)), {
     path: ['avoidColours'],
     message: 'a colour cannot be both loved and avoided',
-  });
+  })
+  .refine(
+    (a) =>
+      !OPPOSITE_FRAME_NOTES.some(
+        ([x, y]) => a.frame.includes(x) && a.frame.includes(y),
+      ),
+    { path: ['frame'], message: 'frame notes contradict each other' },
+  );
 
 export const profileSchema = z.object({
   profile: profileAnswersSchema

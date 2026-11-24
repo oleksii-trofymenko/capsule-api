@@ -80,7 +80,7 @@ export const stylistPrompts: Record<Locale, StylistPrompts> = {
       emptyWardrobe: 'The wardrobe is empty so far.',
       profile: 'What the person told us about themselves',
       selfUse:
-        'Use this quietly to choose colours near the face and proportions; mention the body only if they ask.',
+        'Use this to choose colours near the face and proportions. You may say an outfit shows off what they want to show off, but never describe their frame or height back to them.',
       notes: 'What the person told us in earlier conversations',
       noteKinds: { like: 'Likes', dislike: 'Dislikes', fact: 'Fact' },
       outfit: 'The outfit',
