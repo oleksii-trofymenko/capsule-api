@@ -1944,7 +1944,10 @@
                                 "type": "string",
                                 "enum": [
                                   "fit",
-                                  "lifestyle"
+                                  "lifestyle",
+                                  "colourTemperature",
+                                  "colourContrast",
+                                  "height"
                                 ]
                               },
                               "type": {
@@ -1993,7 +1996,9 @@
                                   "directions",
                                   "favouriteColours",
                                   "avoidColours",
-                                  "neverWear"
+                                  "neverWear",
+                                  "frame",
+                                  "playUp"
                                 ]
                               },
                               "type": {
@@ -2258,6 +2263,67 @@
                             ]
                           }
                         },
+                        "colourTemperature": {
+                          "default": "skip",
+                          "type": "string",
+                          "enum": [
+                            "warm",
+                            "cool",
+                            "neutral",
+                            "skip"
+                          ]
+                        },
+                        "colourContrast": {
+                          "default": "skip",
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "medium",
+                            "low",
+                            "skip"
+                          ]
+                        },
+                        "height": {
+                          "default": "skip",
+                          "type": "string",
+                          "enum": [
+                            "petite",
+                            "average",
+                            "tall",
+                            "skip"
+                          ]
+                        },
+                        "frame": {
+                          "default": [],
+                          "maxItems": 3,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "longer-torso",
+                              "longer-legs",
+                              "broader-shoulders",
+                              "fuller-hips",
+                              "defined-waist",
+                              "straight-frame"
+                            ]
+                          }
+                        },
+                        "playUp": {
+                          "default": [],
+                          "maxItems": 2,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "waist",
+                              "legs",
+                              "shoulders",
+                              "neckline",
+                              "arms"
+                            ]
+                          }
+                        },
                         "updatedAt": {
                           "type": "string",
                           "format": "date-time",
@@ -2272,6 +2338,11 @@
                         "avoidColours",
                         "lifestyle",
                         "neverWear",
+                        "colourTemperature",
+                        "colourContrast",
+                        "height",
+                        "frame",
+                        "playUp",
                         "updatedAt"
                       ],
                       "additionalProperties": false
@@ -2555,6 +2626,67 @@
                         "bold-patterns"
                       ]
                     }
+                  },
+                  "colourTemperature": {
+                    "default": "skip",
+                    "type": "string",
+                    "enum": [
+                      "warm",
+                      "cool",
+                      "neutral",
+                      "skip"
+                    ]
+                  },
+                  "colourContrast": {
+                    "default": "skip",
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low",
+                      "skip"
+                    ]
+                  },
+                  "height": {
+                    "default": "skip",
+                    "type": "string",
+                    "enum": [
+                      "petite",
+                      "average",
+                      "tall",
+                      "skip"
+                    ]
+                  },
+                  "frame": {
+                    "default": [],
+                    "maxItems": 3,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "longer-torso",
+                        "longer-legs",
+                        "broader-shoulders",
+                        "fuller-hips",
+                        "defined-waist",
+                        "straight-frame"
+                      ]
+                    }
+                  },
+                  "playUp": {
+                    "default": [],
+                    "maxItems": 2,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "waist",
+                        "legs",
+                        "shoulders",
+                        "neckline",
+                        "arms"
+                      ]
+                    }
                   }
                 },
                 "required": [
@@ -2755,6 +2887,67 @@
                             ]
                           }
                         },
+                        "colourTemperature": {
+                          "default": "skip",
+                          "type": "string",
+                          "enum": [
+                            "warm",
+                            "cool",
+                            "neutral",
+                            "skip"
+                          ]
+                        },
+                        "colourContrast": {
+                          "default": "skip",
+                          "type": "string",
+                          "enum": [
+                            "high",
+                            "medium",
+                            "low",
+                            "skip"
+                          ]
+                        },
+                        "height": {
+                          "default": "skip",
+                          "type": "string",
+                          "enum": [
+                            "petite",
+                            "average",
+                            "tall",
+                            "skip"
+                          ]
+                        },
+                        "frame": {
+                          "default": [],
+                          "maxItems": 3,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "longer-torso",
+                              "longer-legs",
+                              "broader-shoulders",
+                              "fuller-hips",
+                              "defined-waist",
+                              "straight-frame"
+                            ]
+                          }
+                        },
+                        "playUp": {
+                          "default": [],
+                          "maxItems": 2,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "waist",
+                              "legs",
+                              "shoulders",
+                              "neckline",
+                              "arms"
+                            ]
+                          }
+                        },
                         "updatedAt": {
                           "type": "string",
                           "format": "date-time",
@@ -2769,6 +2962,11 @@
                         "avoidColours",
                         "lifestyle",
                         "neverWear",
+                        "colourTemperature",
+                        "colourContrast",
+                        "height",
+                        "frame",
+                        "playUp",
                         "updatedAt"
                       ],
                       "additionalProperties": false

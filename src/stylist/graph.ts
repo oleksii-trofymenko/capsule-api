@@ -117,10 +117,19 @@ function situation(s: GraphState): string[] {
         size ? [`${part} ${size.system} ${size.value}`] : [],
       )
       .join(', ');
+    // Only what the person chose to say: a skipped answer leaves no trace in the prompt.
+    const self = [
+      p.colourTemperature !== 'skip' && `colouring ${p.colourTemperature}`,
+      p.colourContrast !== 'skip' && `${p.colourContrast} contrast`,
+      p.height !== 'skip' && `height ${p.height}`,
+      p.frame.length > 0 && `frame ${p.frame.join(', ')}`,
+      p.playUp.length > 0 && `likes to show off ${p.playUp.join(', ')}`,
+    ].filter((part) => part !== false);
     blocks.push(
       `${l.profile}: sizes ${sizes || '-'}; fit ${p.fit}; style ${p.directions.join(', ')}; ` +
         `loves ${p.favouriteColours.join(', ') || '-'}; avoids ${p.avoidColours.join(', ') || '-'}; ` +
-        `never wears ${p.neverWear.join(', ') || '-'}; week ${p.lifestyle}.`,
+        `never wears ${p.neverWear.join(', ') || '-'}; week ${p.lifestyle}.` +
+        (self.length > 0 ? `\n${self.join('; ')}. ${l.selfUse}` : ''),
     );
   }
   if (s.context.notes.length > 0) {

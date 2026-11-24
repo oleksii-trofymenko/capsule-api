@@ -1,9 +1,14 @@
 import { z } from 'zod';
 import {
+  COLOUR_CONTRASTS,
   COLOUR_FAMILIES,
+  COLOUR_TEMPERATURES,
   FITS,
+  FRAME_NOTES,
+  HEIGHTS,
   LIFESTYLES,
   NEVER_WEAR,
+  PLAY_UP,
   STYLE_DIRECTIONS,
 } from '../db/schema.js';
 import { feedbackSummarySchema } from '../outfits/outfits.schemas.js';
@@ -14,6 +19,12 @@ const choices = <T extends readonly [string, ...string[]]>(codes: T) =>
     .array(z.enum(codes))
     .max(codes.length)
     .refine((a) => new Set(a).size === a.length, 'choices must not repeat');
+
+const OPPOSITE_FRAME_NOTES = [
+  ['longer-torso', 'longer-legs'],
+  ['broader-shoulders', 'fuller-hips'],
+  ['defined-waist', 'straight-frame'],
+] as const;
 
 export const profileAnswersSchema = z
   .object({
@@ -30,11 +41,24 @@ export const profileAnswersSchema = z
     avoidColours: choices(COLOUR_FAMILIES),
     lifestyle: z.enum(LIFESTYLES),
     neverWear: choices(NEVER_WEAR),
+    // Optional, with defaults, so clients built before these questions still save.
+    colourTemperature: z.enum(COLOUR_TEMPERATURES).default('skip'),
+    colourContrast: z.enum(COLOUR_CONTRASTS).default('skip'),
+    height: z.enum(HEIGHTS).default('skip'),
+    frame: choices(FRAME_NOTES).max(3).default([]),
+    playUp: choices(PLAY_UP).max(2).default([]),
   })
   .refine((a) => !a.avoidColours.some((c) => a.favouriteColours.includes(c)), {
     path: ['avoidColours'],
     message: 'a colour cannot be both loved and avoided',
-  });
+  })
+  .refine(
+    (a) =>
+      !OPPOSITE_FRAME_NOTES.some(
+        ([x, y]) => a.frame.includes(x) && a.frame.includes(y),
+      ),
+    { path: ['frame'], message: 'frame notes contradict each other' },
+  );
 
 export const profileSchema = z.object({
   profile: profileAnswersSchema
@@ -62,7 +86,13 @@ export const quizSchema = z.object({
         systems: z.array(option),
       }),
       z.object({
-        id: z.enum(['fit', 'lifestyle']),
+        id: z.enum([
+          'fit',
+          'lifestyle',
+          'colourTemperature',
+          'colourContrast',
+          'height',
+        ]),
         type: z.literal('single'),
         question: z.string(),
         options: z.array(option),
@@ -73,6 +103,8 @@ export const quizSchema = z.object({
           'favouriteColours',
           'avoidColours',
           'neverWear',
+          'frame',
+          'playUp',
         ]),
         type: z.literal('multi'),
         question: z.string(),

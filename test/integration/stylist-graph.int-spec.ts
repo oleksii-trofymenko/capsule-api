@@ -7,6 +7,7 @@ import { OccasionsService } from '../../src/occasions/occasions.service.js';
 import type { NewNote } from '../../src/memory/memory.schemas.js';
 import type { NewOutfit } from '../../src/outfits/outfit-store.js';
 import type { NewTrace } from '../../src/traces/traces.schemas.js';
+import type { ProfileAnswers } from '../../src/profile/profile.schemas.js';
 import { sampleWardrobe } from '../../src/playground/sample-data.js';
 import { stylistPrompts } from '../../src/stylist/stylist.prompts.js';
 import type {
@@ -26,7 +27,11 @@ import {
 const occasions = new OccasionsService(readLibrary());
 const NOW = new Date('2026-11-17T12:00:00Z');
 
-function setup(script: ScriptStep[], notes: NewNote[] = []) {
+function setup(
+  script: ScriptStep[],
+  notes: NewNote[] = [],
+  profile: ProfileAnswers | null = null,
+) {
   const model = new ScriptedChatModel(script);
   const router = new ModelRouter(
     parseEnv(TEST_ENV),
@@ -39,7 +44,7 @@ function setup(script: ScriptStep[], notes: NewNote[] = []) {
   const stylist = new StylistService(
     router,
     occasions,
-    { load: async () => ({ wardrobe: sampleWardrobe, profile: null, notes }) },
+    { load: async () => ({ wardrobe: sampleWardrobe, profile, notes }) },
     {
       save: async (_userId, outfit) => {
         saved.push(outfit);
@@ -434,5 +439,56 @@ describe('Stylist graph', () => {
       { itemIds: ['w08', 'w01'], missing: null },
     ]);
     expect(trace.calls[2].output).toBe('Navy wool blazer, white shirt.');
+  });
+
+  describe('colouring and frame from the quiz', () => {
+    const profile: ProfileAnswers = {
+      sizes: { top: null, bottom: null, shoes: null },
+      fit: 'regular',
+      directions: ['classic'],
+      favouriteColours: [],
+      avoidColours: [],
+      lifestyle: 'mixed',
+      neverWear: [],
+      colourTemperature: 'warm',
+      colourContrast: 'high',
+      height: 'petite',
+      frame: ['longer-torso'],
+      playUp: ['waist', 'legs'],
+    };
+    const outfitScript = () => [
+      understood('outfit'),
+      picked(['w06', 'w01']),
+      textChunks('Trousers and shirt.'),
+    ];
+
+    it('reach the compose and write prompts with how to use them', async () => {
+      const { model, stylist } = setup(outfitScript(), [], profile);
+      await run(stylist, 'Something for the office?');
+
+      const line =
+        'colouring warm; high contrast; height petite; frame longer-torso; likes to show off waist, legs. ' +
+        stylistPrompts.en.labels.selfUse;
+      expect(systemText(model.received[1])).toContain(line);
+      expect(systemText(model.received[2])).toContain(line);
+    });
+
+    it('leave no trace when every answer was skipped', async () => {
+      const skipped: ProfileAnswers = {
+        ...profile,
+        colourTemperature: 'skip',
+        colourContrast: 'skip',
+        height: 'skip',
+        frame: [],
+        playUp: [],
+      };
+      const { model, stylist } = setup(outfitScript(), [], skipped);
+      await run(stylist, 'Something for the office?');
+
+      const compose = systemText(model.received[1]);
+      expect(compose).toContain('What the person told us about themselves');
+      expect(compose).not.toContain('colouring');
+      expect(compose).not.toContain(stylistPrompts.en.labels.selfUse);
+    });
   });
 });

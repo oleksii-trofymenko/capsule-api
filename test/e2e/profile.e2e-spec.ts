@@ -47,8 +47,13 @@ describe('Profile API', () => {
       'directions',
       'favouriteColours',
       'avoidColours',
+      'colourTemperature',
+      'colourContrast',
       'lifestyle',
       'neverWear',
+      'height',
+      'frame',
+      'playUp',
     ]);
     expect(quiz.body.questions[2]).toMatchObject({ type: 'multi', max: 3 });
     expect(quiz.body.questions[0].systems).toContainEqual({
@@ -66,10 +71,37 @@ describe('Profile API', () => {
 
     const saved = await ana.put('/v1/profile').send(answers).expect(200);
     expect(saved.body).toEqual({
-      profile: { ...answers, updatedAt: expect.any(String) },
+      // Colouring and frame were not sent, as by a client older than those questions.
+      profile: {
+        ...answers,
+        colourTemperature: 'skip',
+        colourContrast: 'skip',
+        height: 'skip',
+        frame: [],
+        playUp: [],
+        updatedAt: expect.any(String),
+      },
       feedback: noFeedback,
     });
     expect((await ana.get('/v1/profile').expect(200)).body).toEqual(saved.body);
+  });
+
+  it('keeps the colouring and frame the person describes', async () => {
+    const ana = as(await signUp('ana@example.com'));
+    const described = {
+      colourTemperature: 'cool',
+      colourContrast: 'low',
+      height: 'tall',
+      frame: ['broader-shoulders', 'defined-waist'],
+      playUp: ['neckline'],
+    };
+    await ana
+      .put('/v1/profile')
+      .send({ ...answers, ...described })
+      .expect(200);
+    expect(
+      (await ana.get('/v1/profile').expect(200)).body.profile,
+    ).toMatchObject(described);
   });
 
   it('replaces the profile when the quiz is answered again, and allows skipped sizes', async () => {
@@ -143,6 +175,22 @@ describe('Profile API', () => {
       { ...answers, avoidColours: ['blues'] },
     ],
     ['an unknown lifestyle', { ...answers, lifestyle: 'astronaut' }],
+    ['an unknown height', { ...answers, height: 'giant' }],
+    [
+      'four frame notes',
+      {
+        ...answers,
+        frame: ['longer-torso', 'fuller-hips', 'defined-waist', 'longer-legs'],
+      },
+    ],
+    [
+      'frame notes that contradict each other',
+      { ...answers, frame: ['broader-shoulders', 'fuller-hips'] },
+    ],
+    [
+      'three things to show off',
+      { ...answers, playUp: ['waist', 'legs', 'arms'] },
+    ],
   ])('rejects %s with 400', async (_name, body) => {
     const ana = as(await signUp('ana@example.com'));
     await ana.put('/v1/profile').send(body).expect(400);
